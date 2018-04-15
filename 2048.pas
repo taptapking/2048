@@ -712,7 +712,7 @@ begin
 end;
 begin
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
-     ch3:='1';diff:=512;up:=#72;down:=#80;left:=#75;right:=#77;re:='r';
+     ch3:='1';ch2:='1';diff:=512;up:=#72;down:=#80;left:=#75;right:=#77;re:='r';
      textcolor(black);
      textbackground(white);
      repeat
