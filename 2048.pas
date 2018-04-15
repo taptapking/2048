@@ -4,7 +4,7 @@ var a,c:mang;
         i,j,diff,diff1,difftotal,code,count:word;
         ch,ch1,ch2,ch3:char;
         fmove,fnum:longint;
-        moved,loaded{,wide}:boolean;
+        moved,loaded,wide:boolean;
         hidden,hardrock,spunout,nofail,easy,flashlight:shortint;
         cs,s:byte;
 function lnth(a:longint):byte;
@@ -575,11 +575,11 @@ begin
         calibrate('Hit 0 to turn on flashlight mod',s+7)
         else
         calibrate('Hit 0 to turn off flashlight mod',s+8);
-{
+
      calibrate('hit w to toggle widescreen mode',s+7);
-}
+
      calibrate('Hit esc to Exit',s-8);
-     calibrate('UPDATE 3.1',s-13);
+     calibrate('UPDATE 3.11',s-13);
      writeln('RECORD:',fnum,';max number:',fmove);
      for k:=2 to (s-21) div 2 do
          write(' ');
@@ -622,16 +622,16 @@ begin
      calibrate('Hit 4 for master',s-1);
 end;
 begin
-     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;{wide:=false;}
+     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
      textcolor(black);
      textbackground(white);
      repeat
            count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
            repeat
-{case wide of
+case wide of
 true:s:=120;
 false:s:=80;
-end;}
+end;
                 menu1;
                 ch:=readkey;
                 if ch='2' then
@@ -651,11 +651,11 @@ end;}
                 if ch='8' then spunout:=spunout*(-1);
                 if ch='9' then nofail:=nofail*(-1);
                 if ch='0' then flashlight:=flashlight*(-1);
-{if ch='w' then
+if ch='w' then
 case s of
 80:wide:=true;
 120:wide:=false;
-end;}
+end;
                 if (ch='d') and (checkfile('save.txt')=true) then
                    cleargame;
                 if (ch='4') and (checkfile('save.txt')=true) then break;
@@ -710,7 +710,9 @@ end;}
            repeat
                  clrscr;
                  printf;
-                 ch:=readkey;
+                 repeat
+                        ch:=readkey;
+                 until (ch=#72) or (ch=#80) or (ch=#75) or (ch=#77) or (ch='r') or (ch=chr(27));
                  if (count>0) and (ch='r') and (moved=true) then rewind;
                  if (ch=#72) or (ch=#80) or (ch=#75) or (ch=#77) then
                  begin
