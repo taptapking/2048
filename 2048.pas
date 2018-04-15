@@ -5,7 +5,7 @@ var a,c:mang;
         ch,ch1,ch2,ch3:char;
         fmove,fnum:longint;
         moved,loaded{,wide}:boolean;
-        hidden,hardrock,spunout,nofail,easy:shortint;
+        hidden,hardrock,spunout,nofail,easy,flashlight:shortint;
         cs,s:byte;
 function lnth(a:longint):byte;
 var l:byte;
@@ -17,18 +17,19 @@ begin
      until a=a div 10;
      lnth:=l;
 end;
-function multiplier(ez,hd,hr,so,nf:byte):real;
+function multiplier(ez,hd,hr,so,nf,fl:byte):real;
 var m:real;
 begin
      m:=1;
      if ez=1 then m:=m*0.5;
      if hd=1 then m:=m*1.12;
+     if fl=1 then m:=m*1.12;
      if hr=1 then m:=m*1.06;
      if so=1 then m:=m*0.9;
      if nf=1 then m:=m*0.5;
      multiplier:=m;
 end;
-function point(a:mang;cs,hd,hr,so,nf:byte;diff:word):longint;
+function point(a:mang;cs,hd,hr,so,nf,fl:byte;diff:word):longint;
 var i,j,pt:longint;
 begin
      pt:=0;
@@ -247,9 +248,9 @@ begin
         if lose(a,cs)=false then
            write('|')
            else write('  |');
-        for i:=2 to (s-sqr(cs+1)*2-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,diff1))) do
+        for i:=2 to (s-sqr(cs+1)*2-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1))) do
             write(' ');
-        writeln(point(a,cs,hidden,hardrock,spunout,nofail,diff1));
+        writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
         for i:=1 to sqr(cs+1) do
             write('--');
         write('|');
@@ -257,22 +258,23 @@ begin
      end
      else
      begin
-          for k:=1 to s-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,diff1)) do
+          for k:=1 to s-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) do
               write(' ');
-          writeln(point(a,cs,hidden,hardrock,spunout,nofail,diff1));
+          writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
      end;
      for k:=2 to (s-6*(cs+1)) div 2 do
          write(' ');
      write('|');
      for k:=1 to cs+1 do
          write('-----|');
-     for k:=1 to (s-6*(cs+1)) div 2-round((nofail+hidden+hardrock+spunout+cs+2)*1.5)-1 do
+     for k:=1 to (s-6*(cs+1)) div 2-round((nofail+hidden+hardrock+spunout+flashlight+cs+2)*1.5)-2 do
          write(' ');
      if cs>=4 then write('EZ ');
      if nofail=1 then write('NF ');
      if spunout=1 then write('SO ');
      if hidden=1 then write('HD ');
      if hardrock=1 then write('HR ');
+     if flashlight=1 then write('FL');
      writeln;
      for i:=0 to cs do
      begin
@@ -280,27 +282,54 @@ begin
               write(' ');
           write('|');
           for j:=0 to cs do
-              if a[i,j]<>0 then
-              begin
-                   if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
-                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
-                   if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
-                   if (a[i,j]<10) and (hidden=-1) then
-                      write('  ',a[i,j],'  |');
-                   if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                      write('  ',a[i,j],' |');
-                   if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                      write(' ',a[i,j],' |');
-                   if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                      write(' ',a[i,j],'|');
-                   if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                      write(a[i,j],'|');
-              end
-              else write('     |');
+          begin
+                   if (a[i,j]<>0) and (flashlight<>1) then
+                   begin
+                        if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
+                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
+                        if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
+                        if (a[i,j]<10) and (hidden=-1) then
+                           write('  ',a[i,j],'  |');
+                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
+                           write('  ',a[i,j],' |');
+                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
+                           write(' ',a[i,j],' |');
+                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
+                           write(' ',a[i,j],'|');
+                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
+                           write(a[i,j],'|');
+                   end;
+                   if (a[i,j]=0) and (flashlight<>1) then write('     |');
+                    if flashlight=1 then
+                    begin
+                    if ((health(a,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a,cs)<=2) and (i>=2) and (j<=cs-2)) then
+                        begin
+                             if a[i,j]=0 then write('     |');
+                             if a[i,j]<>0 then
+                             begin
+                                  if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
+                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
+                                  if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
+                                  if (a[i,j]<10) and (hidden=-1) then
+                                     write('  ',a[i,j],'  |');
+                                  if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
+                                     write('  ',a[i,j],' |');
+                                  if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
+                                     write(' ',a[i,j],' |');
+                                  if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
+                                     write(' ',a[i,j],'|');
+                                  if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
+                                     write(a[i,j],'|');
+                             end;
+                        end
+                        else write('#####|');
+                    end;
+
+          end;
           writeln;
           if i<=cs then
           begin
-               for k:=2 to (s-6*(cs+1)) div 2 do
+               for  k:=2 to (s-6*(cs+1)) div 2 do
                    write(' ');
                write('|');
                for k:=1 to cs do
@@ -424,7 +453,7 @@ var f:text;
 begin
      assign(f,'record.txt');
      rewrite(f);
-     writeln(f,point(a,cs,hidden,hardrock,spunout,nofail,diff1),' ',maxnum(a,cs));
+     writeln(f,point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1),' ',maxnum(a,cs));
      close(f);
 end;
 procedure save;
@@ -459,7 +488,7 @@ begin
                end;
                writeln(f);
           end;
-          write(f,ch2,' ',diff1,' ',count,' ',hidden,' ',hardrock,' ',spunout,' ',nofail);
+          write(f,ch2,' ',diff1,' ',count,' ',hidden,' ',hardrock,' ',spunout,' ',nofail,' ',flashlight);
           close(f);
      end;
 end;
@@ -482,11 +511,12 @@ begin
                  read(f,a[i,j]);
              readln(f);
         end;
-        readln(f,ch2,diff1,count,hidden,hardrock,spunout,nofail);
+        readln(f,ch2,diff1,count,hidden,hardrock,spunout,nofail,flashlight);
         if hidden=0 then hidden:=-1;
         if hardrock=0 then hardrock:=-1;
         if spunout=0 then spunout:=-1;
         if nofail=0 then nofail:=-1;
+        if flashlight=0 then flashlight:=-1;
         close(f);
 end;
 procedure cleargame;
@@ -509,7 +539,7 @@ begin
      for k:=1 to s-1 do
          write('-');
      writeln;
-     calibrate('2048 Advanced for DOS',s);
+     calibrate('2048 Advanced',s);
      for k:=1 to s-1 do
          write('-');
      writeln;
@@ -541,15 +571,19 @@ begin
         calibrate('Hit 9 to turn on no-fail mod',s+4)
         else
         calibrate('Hit 9 to turn off no-fail mod',s+5);
+     if flashlight=-1 then
+        calibrate('Hit 0 to turn on flashlight mod',s+7)
+        else
+        calibrate('Hit 0 to turn off flashlight mod',s+8);
 {
      calibrate('hit w to toggle widescreen mode',s+7);
 }
      calibrate('Hit esc to Exit',s-8);
-     calibrate('UPDATE 3.01',s-12);
+     calibrate('UPDATE 3.1',s-13);
      writeln('RECORD:',fnum,';max number:',fmove);
      for k:=2 to (s-21) div 2 do
          write(' ');
-     writeln('Score multiplier:',multiplier(easy,hidden,hardrock,spunout,nofail):0:2);
+     writeln('Score multiplier:',multiplier(easy,hidden,hardrock,spunout,nofail,flashlight):0:2);
 end;
 procedure menu2;
 var k:byte;
@@ -588,7 +622,7 @@ begin
      calibrate('Hit 4 for master',s-1);
 end;
 begin
-     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;cs:=3;easy:=-1;s:=80;{wide:=false;}
+     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;{wide:=false;}
      textcolor(black);
      textbackground(white);
      repeat
@@ -616,6 +650,7 @@ end;}
                 if ch='7' then hardrock:=hardrock*(-1);
                 if ch='8' then spunout:=spunout*(-1);
                 if ch='9' then nofail:=nofail*(-1);
+                if ch='0' then flashlight:=flashlight*(-1);
 {if ch='w' then
 case s of
 80:wide:=true;
@@ -711,11 +746,12 @@ end;}
                 end;
                 if (lose(a,cs)=true) and (nofail=1) then continue;
            until (win(a,diff,cs)=true) or (lose(a,cs)=true);
-           if (point(a,cs,hidden,hardrock,spunout,nofail,diff1)>fnum) then
+           if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
               writef;
            repeat
                  if win(a,diff,cs)=true then
                  begin
+                      flashlight:=-1;
                       hidden:=-1;
                       clrscr;
                       printf;
@@ -725,6 +761,7 @@ end;}
                  end;
                  if lose(a,cs)=true then
                  begin
+                      flashlight:=-1;
                       hidden:=-1;
                       clrscr;
                       printf;
