@@ -4,9 +4,54 @@ var a,c:mang;
         i,j,diff,diff1,difftotal,code,count:word;
         ch,ch1,ch2,ch3:char;
         fmove,fnum:longint;
-        moved,loaded,easy:boolean;
-        hidden,hardrock:shortint;
-        cs:byte;
+        moved,loaded{,wide}:boolean;
+        hidden,hardrock,spunout,nofail,easy:shortint;
+        cs,s:byte;
+function multiplier(ez,hd,hr,so,nf:byte):real;
+var m:real;
+begin
+m:=1;
+if ez=1 then m:=m*0.5;
+if hd=1 then m:=m*1.12;
+if hr=1 then m:=m*1.06;
+if so=1 then m:=m*0.9;
+if nf=1 then m:=m*0.5;
+multiplier:=m;
+end;
+function point(a:mang;cs,hd,hr,so,nf:byte;diff:word):longint;
+var i,j,pt:longint;
+begin
+pt:=0;
+for i:=0 to cs do
+for j:=0 to cs do
+pt:=pt+a[i,j];
+if cs>=4 then pt:=round(pt*0.5);
+if hd=1 then pt:=round(pt*1.12);
+if hr=1 then pt:=round(pt*1.06);
+if so=1 then pt:=round(pt*0.9);
+if nf=1 then pt:=round(pt*0.5);
+pt:=pt*(diff+1);
+point:=pt;
+end;
+procedure continue;
+var b:array[1..121] of longint;
+    tmp:longint;
+begin
+for i:=0 to cs do
+for j:=0 to cs do
+b[i*(cs+1)+(j+1)]:=a[i,j];
+for i:=1 to sqr(cs+1)-1 do
+for j:=i+1 to sqr(cs+1) do
+if  b[i]>b[j] then
+begin
+tmp:=b[i];
+b[i]:=b[j];
+b[j]:=tmp;
+end;
+for i:=0 to cs do
+for j:=0 to cs do
+if (a[i,j]=b[1]) or (a[i,j]=b[2]) then a[i,j]:=0;
+end;
 function checkfile(fl:string):boolean;
 var f:text;
     chk:boolean;
@@ -139,22 +184,51 @@ end;
 procedure printf;
 var i,j,k:byte;
 begin
-writeln('-------------------------------------------------------------------------------');
+for i:=1 to s-1 do
+write('-');
+writeln;
 if diff1=0 then
-writeln('                                  EASY ',diff);
+begin
+for i:=1 to (s-9) div 2  do
+write(' ');
+writeln('EASY ',diff);
+end;
 if diff1=1 then
-writeln('                                  NORMAL ',diff);
+begin
+for i:=1 to (s-11) div 2  do
+write(' ');
+writeln('NORMAL ',diff);
+end;
 if diff1=2 then
-writeln('                                   HARD ',diff);
+begin
+for i:=1 to (s-9) div 2  do
+write(' ');
+writeln('HARD ',diff);
+end;
 if diff1=3 then
-writeln('                                VERY HARD ',diff);
+begin
+for i:=1 to (s-14) div 2  do
+write(' ');
+writeln('VERY HARD ',diff);
+end;
 if diff1=4 then
-writeln('                                  MASTER ',diff);
-writeln('-------------------------------------------------------------------------------');
+begin
+for i:=1 to (s-11) div 2  do
+write(' ');
+writeln('MASTER ',diff);
+end;
+for i:=1 to s-1 do
+write('-');
+writeln;
 for i:=1 to difftotal do
 write('* ');
 writeln;
-writeln('-------------------------------------------------------------------------------');
+{writeln('-------------------------------------------------------------------------------');}
+if nofail<>1 then begin
+for i:=1 to sqr(cs+1) do
+write('--');
+write('|');
+writeln;
 if lose(a,cs)=false then
 for i:=1 to health(a,cs) do
 write('##');
@@ -163,11 +237,40 @@ write('  ');
 if lose(a,cs)=false then
 write('|')
 else write('  |');
+for i:=2 to (s-sqr(cs+1)*2-7) do
+write(' ');
+writeln(point(a,cs,hidden,hardrock,spunout,nofail,diff1));
+{writeln('-------------------------------------------------------------------------------');}
+for i:=1 to sqr(cs+1) do
+write('--');
+write('|');
 writeln;
-writeln('-------------------------------------------------------------------------------');
+end
+else
+begin
+for k:=1 to s-7 do
+write(' ');
+writeln(point(a,cs,hidden,hardrock,spunout,nofail,diff1));
+end;
+for k:=2 to (s-6*(cs+1)) div 2 do
+write(' ');
+write('|');
+{write('                          |');}
+for k:=1 to cs+1 do
+write('-----|');
+for k:=1 to (s-6*(cs+1)) div 2-16 do
+write(' ');
+if cs>=4 then write('EZ ');
+if nofail=1 then write('NF ');
+if spunout=1 then write('SO ');
+if hidden=1 then write('HD ');
+if hardrock=1 then write('HR ');
+writeln;
 for i:=0 to cs do
 begin
-write('                          |');
+for k:=2 to (s-6*(cs+1)) div 2 do
+write(' ');
+write('|');
 for j:=0 to cs do
 if a[i,j]<>0 then
 begin
@@ -187,16 +290,19 @@ write(a[i,j],'|');
 end
 else write('     |');
 writeln;
-if i<cs then
+if i<=cs then
 begin
-write('                          |');
+for k:=2 to (s-6*(cs+1)) div 2 do
+write(' ');
+write('|');
 for k:=1 to cs do
-write('------');
+write('-----|');
 writeln('-----|');
 end;
 end;
-writeln('-------------------------------------------------------------------------------');
-writeln('                                 Moves:',count);
+{writeln('-------------------------------------------------------------------------------');}
+{writeln('                                   Moves:',count);}
+writeln('Moves:',count);
 end;
 procedure move(c:char);
 var i,j,n:byte;
@@ -258,7 +364,7 @@ var i,j,k:byte;
 begin
 if c=#72 then
 for i:=0 to cs-1 do
-for j:=0 to cs-1 do
+for j:=0 to cs do
 if a[i,j]=a[i+1,j] then
 begin
 a[i,j]:=a[i,j]+a[i+1,j];
@@ -300,6 +406,7 @@ close(f);
 end;
 function maxnum(a:mang;cs:byte):longint;
 var i,j,m:longint;
+
 begin
 m:=a[0,0];
 for i:=0 to cs do
@@ -312,7 +419,7 @@ var f:text;
 begin
 assign(f,'record.txt');
 rewrite(f);
-writeln(f,maxnum(a,cs),' ',count);
+writeln(f,point(a,cs,hidden,hardrock,spunout,nofail,diff1),' ',maxnum(a,cs));
 close(f);
 end;
 procedure save;
@@ -347,7 +454,7 @@ write(f,a[i,j]);
 end;
 writeln(f);
 end;
-write(f,ch2,' ',diff1,' ',count,' ',hidden,' ',hardrock);
+write(f,ch2,' ',diff1,' ',count,' ',hidden,' ',hardrock,' ',spunout,' ',nofail);
 close(f);
 end;
 end;
@@ -370,9 +477,11 @@ for j:=0 to cs do
 read(f,a[i,j]);
 readln(f);
 end;
-readln(f,ch2,diff1,count,hidden,hardrock);
+readln(f,ch2,diff1,count,hidden,hardrock,spunout,nofail);
 if hidden=0 then hidden:=-1;
 if hardrock=0 then hardrock:=-1;
+if spunout=0 then spunout:=-1;
+if nofail=0 then nofail:=-1;
 close(f);
 end;
 procedure cleargame;
@@ -381,69 +490,109 @@ begin
 assign(f,'save.txt');
 erase(f);
 end;
+procedure calibrate(st:string;s:byte);
+var k:byte;
+begin
+for k:=1 to (s-length(st)) div 2 do
+write(' ');
+writeln(st);
+end;
 procedure menu1;
+var k:byte;
 begin
 clrscr;
-writeln('-------------------------------------------------------------------------------');
-writeln('                               2048 Lite for DOS');
-writeln('-------------------------------------------------------------------------------');
-writeln('                            Hit 1 to start a game');
-writeln('                            Hit 2 to use Night theme');
-writeln('                            Hit 3 to use Classic theme');
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('2048 Advanced for DOS',s);
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('Hit 1 to start a game',s-2);
+calibrate('Hit 2 to use Night theme',s);
+calibrate('Hit 3 to use Classic theme',s+2);
 if checkfile('save.txt')=true then
 begin
-writeln('                            Hit 4 to load your game');
-writeln('                            Hit d to clear your game');
+calibrate('Hit 4 to load your game',s-1);
+calibrate('Hit d to clear your game',s);
 end;
 if hidden=-1 then
-writeln('                            Hit 5 to turn on hidden mod')
+calibrate('Hit 5 to turn on hidden mod',s+3)
 else
-writeln('                            Hit 5 to turn off hidden mod');
-if easy=true then
-writeln('                            Hit 6 to turn off easy mod')
+calibrate('Hit 5 to turn off hidden mod',s+4);
+if easy=-1 then
+calibrate('Hit 6 to turn on easy mod',s+1)
 else
-writeln('                            Hit 6 to turn on easy mod');
+calibrate('Hit 6 to turn off easy mod',s+2);
 if hardrock=-1 then
-writeln('                            Hit 7 to turn on hard rock mod')
+calibrate('Hit 7 to turn on hard rock mod',s+6)
 else
-writeln('                            Hit 7 to turn off hard rock mod');
-writeln('                            Hit esc to Exit');
-writeln('                            UPDATE 2.2');
-writeln('                            RECORD:',fnum,';moves:',fmove);
+calibrate('Hit 7 to turn off hard rock mod',s+7);
+if spunout=-1 then
+calibrate('Hit 8 to turn on spun out mod',s+5)
+else
+calibrate('Hit 8 to turn off spun out mod',s+6);
+if nofail=-1 then
+calibrate('Hit 9 to turn on no-fail mod (unranked)',s+15)
+else
+calibrate('Hit 9 to turn off no-fail mod (unranked)',s+16);
+{
+calibrate('hit w to toggle widescreen mode',s+7);
+}
+calibrate('Hit esc to Exit',s-8);
+calibrate('UPDATE 3.0',s-13);
+writeln('RECORD:',fnum,';max number:',fmove);
+for k:=2 to (s-21) div 2 do
+write(' ');
+writeln('Score multiplier:',multiplier(easy,hidden,hardrock,spunout,nofail):0:2);
 end;
 procedure menu2;
+var k:byte;
 begin
 clrscr;
-writeln('-------------------------------------------------------------------------------');
-writeln('                              Select Target Number');
-writeln('-------------------------------------------------------------------------------');
-writeln('                               Hit 0 for endless');
-writeln('                               Hit 1 for 512');
-writeln('                               Hit 2 for 1024');
-writeln('                               Hit 3 for 2048');
-writeln('                               Hit 4 for 4096');
-writeln('                               Hit 5 for 8192');
-writeln('                               Hit 6 for 16384');
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('Select Target Number',s);
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('Hit 0 for endless',s);
+calibrate('Hit 1 for 512',s-4);
+calibrate('Hit 2 for 1024',s-3);
+calibrate('Hit 3 for 2048',s-3);
+calibrate('Hit 4 for 4096',s-3);
+calibrate('Hit 5 for 8192',s-3);
+calibrate('Hit 6 for 16384',s-2);
 end;
 procedure menu3;
+var k:byte;
 begin
 clrscr;
-writeln('-------------------------------------------------------------------------------');
-writeln('                               Select Difficulty');
-writeln('-------------------------------------------------------------------------------');
-writeln('                               Hit 0 for easy');
-writeln('                               Hit 1 for normal');
-writeln('                               Hit 2 for hard');
-writeln('                               Hit 3 for very hard');
-writeln('                               Hit 4 for extreme');
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('Select Difficulty',s);
+for k:=1 to s-1 do
+write('-');
+writeln;
+calibrate('Hit 0 for easy',s-3);
+calibrate('Hit 1 for normal',s-1);
+calibrate('Hit 2 for hard',s-3);
+calibrate('Hit 3 for very hard',s+2);
+calibrate('Hit 4 for master',s-1);
 end;
 begin
-hidden:=-1;hardrock:=-1;cs:=3;easy:=false;
+hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;cs:=3;easy:=-1;s:=80;{wide:=false;}
 textcolor(black);
 textbackground(white);
 repeat
 count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
 repeat
+{case wide of
+true:s:=120;
+false:s:=80;
+end;}
 menu1;
 ch:=readkey;
 if ch='2' then
@@ -458,13 +607,18 @@ textcolor(black);
 textbackground(white);
 end;
 if ch='5' then hidden:=hidden*(-1);
+if ch='6' then easy:=easy*(-1);
 if ch='7' then hardrock:=hardrock*(-1);
+if ch='8' then spunout:=spunout*(-1);
+if ch='9' then nofail:=nofail*(-1);
+{if ch='w' then
+case s of
+80:wide:=true;
+120:wide:=false;
+end;}
 if (ch='d') and (checkfile('save.txt')=true) then
 cleargame;
 if (ch='4') and (checkfile('save.txt')=true) then break;
-if ch='6' then
-if easy=true then easy:=false
-else easy:=true;
 until (ch='1') or (ch=chr(27));
 if ch='4' then
 begin
@@ -472,7 +626,7 @@ load;
 loaded:=true;
 end;
 if loaded=false then
-if easy=true then cs:=4
+if easy=1 then cs:=4
 else cs:=3;
 if ch=chr(27) then exit;
 repeat
@@ -505,6 +659,7 @@ val(ch2,difftotal,code);
 difftotal:=difftotal+diff1;
 if cs=4 then difftotal:=round(difftotal*0.75);
 if hardrock=1 then difftotal:=round(difftotal*1.5);
+if spunout=1 then difftotal:=round(difftotal*0.85);
 if loaded=false then
 begin
 for i:=0 to cs do
@@ -522,6 +677,10 @@ begin
 moved:=true;
 backup;
 move(ch);
+if spunout=-1 then
+clear(ch)
+else
+for i:=1 to 11 do
 clear(ch);
 if difference(a,c,cs)=true then
 begin
@@ -545,7 +704,10 @@ ch:=readkey;
 until (ch='y') or (ch='n') or (ch='s');
 if (ch='y') or (ch='s') then break;
 end;
+if (lose(a,cs)=true) and (nofail=1) then continue;
 until (win(a,diff,cs)=true) or (lose(a,cs)=true);
+if (point(a,cs,hidden,hardrock,spunout,nofail,diff1)>fnum) and (nofail<>1) then
+writef;
 repeat
 if win(a,diff,cs)=true then
 begin
@@ -565,8 +727,6 @@ writeln('YOU LOST');
 if loaded=true then
 cleargame;
 end;
-if maxnum(a,cs)>fnum then
-writef;
 if ch='s' then save;
 if (ch='y') or (ch='s') then ch1:='y';
 if (ch<>'y') and (ch<>'s') then
