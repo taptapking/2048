@@ -3,11 +3,22 @@ type mang=array[0..10,0..10] of longint;
 var a,c:mang;
         i,j,diff,diff1,difftotal,code,count:word;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re:char;
-        fmove,fnum:longint;
+        fmove,fnum,bg,txt:longint;
         moved,loaded,wide:boolean;
-        hidden,hardrock,spunout,nofail,easy,flashlight:shortint;
+        hidden,hardrock,spunout,nofail,easy,flashlight,color:shortint;
         cs,s:byte;
         username:string;
+function log2(a:longint):integer;
+var c:integer;
+begin
+        c:=0;
+        while a>1 do
+        begin
+                a:=a div 2;
+                c:=c+1;
+        end;
+        log2:=c;
+end;
 procedure calibrate(st:string;s:byte);
 var k:byte;
 begin
@@ -284,17 +295,29 @@ begin
      for i:=1 to difftotal do
          write('* ');
      writeln;
+
      if nofail<>1 then
      begin
         for i:=1 to sqr(cs+1) do
             write('--');
         write('|');
         writeln;
-        if lose(a,cs)=false then
-           for i:=1 to health(a,cs) do
-               write('##');
-           for i:=1 to sqr(cs+1)-health(a,cs) do
-               write('  ');
+        if color<>-1 then
+        begin
+                if (health(a,cs)>sqr(cs-1)*2) and (health(a,cs)<=sqr(cs-1)*4) then textbackground(2);
+                if (health(a,cs)>sqr(cs-1)) and (health(a,cs)<=sqr(cs-1)*2) then textbackground(3);
+                if (health(a,cs)<=sqr(cs-1)) then textbackground(4);
+                if lose(a,cs)=false then
+                        for i:=1 to health(a,cs) do
+                                write('  ');
+                        textbackground(bg);
+        end
+        else
+                if lose(a,cs)=false then
+                        for i:=1 to health(a,cs) do
+                                write('##');
+                for i:=1 to sqr(cs+1)-health(a,cs) do
+                        write('  ');
         if lose(a,cs)=false then
            write('|')
            else write('  |');
@@ -335,6 +358,12 @@ begin
           begin
                    if (a[i,j]<>0) and (flashlight<>1) then
                    begin
+                        if color<>-1 then
+                        begin
+                                textbackground(round(log2(a[i,j])));
+                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then
+                                   textbackground(round(log2(a[i,j])-1));
+                        end;
                         if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
                         if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
@@ -357,6 +386,12 @@ begin
                              if a[i,j]=0 then write('     |');
                              if a[i,j]<>0 then
                              begin
+                                  if color<>-1 then
+                                  begin
+                                        textbackground(round(log2(a[i,j])));
+                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then
+                                           textbackground(round(log2(a[i,j])-1));
+                                  end;
                                   if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
                                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
                                   if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
@@ -374,7 +409,7 @@ begin
                         end
                         else write('#####|');
                     end;
-
+                    textbackground(bg);
           end;
           writeln;
           if i<=cs then
@@ -522,7 +557,7 @@ var i,j:byte;
     f:text;
     c:char;
 begin
-     if checkfile('save.txt')=true then
+     if (checkfile('save.txt')=true) and (loaded=false) then
      begin
           writeln('We have detected that there is a save file on your computer');
           writeln('If you attempt to save,the save file will be overwritten');
@@ -675,6 +710,8 @@ begin
         {calibrate('Hit 3 to trigger widescreen mode',s);}
         calibrate('Hit 4 to change username',s);
         calibrate('Hit 5 to change keyboard bindings',s);
+        if color=-1 then calibrate('Hit 6 to turn on color',s)
+        else calibrate('Hit 6 to turn off color',s);
         calibrate('Hit esc to exit',s);
 end;
 procedure menu5;
@@ -713,16 +750,17 @@ end;
 begin
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:=#72;down:=#80;left:=#75;right:=#77;re:='r';
-     textcolor(black);
-     textbackground(white);
+     bg:=15;txt:=0;color:=-1;
+     textcolor(txt);
+     textbackground(bg);
      repeat
            count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
            repeat
                 if username='' then username:='Player';
-                {case wide of
+                case wide of
                         true:s:=120;
                         false:s:=80;
-                end;}
+                end;
                 menu1;
                 repeat
                         ch:=readkey;
@@ -736,23 +774,26 @@ begin
                         menu4;
                         repeat
                                 ch4:=readkey;
-                        until (ch4='1') or (ch4='2') {or (ch4='3')} or (ch4=chr(27)) or (ch4='4') or (ch4='5');
+                        until (ch4='1') or (ch4='2') {or (ch4='3')} or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6');
                         if ch4='1' then
                         begin
-                                textcolor(white);
-                                textbackground(black);
+                                bg:=0;txt:=15;
+                                textcolor(txt);
+                                textbackground(bg);
                                 lowvideo;
                         end;
                         if ch4='2' then
                         begin
-                                textcolor(black);
-                                textbackground(white);
+                                bg:=15;txt:=0;
+                                textcolor(txt);
+                                textbackground(bg);
                         end;
                         {if ch4='3' then
                         case s of
                                 80:wide:=true;
                                 120:wide:=false;
                         end;}
+                        if ch4='6' then color:=color*-1;
                         if ch4='4' then
                         begin
                                 writeln('Type your new username');
@@ -795,8 +836,8 @@ begin
                                         repeat
                                                 right:=readkey;
                                                 if right=#0 then right:=readkey;
-                                        until (right<>left) and (right<>down) and (right<>up) and (right<>chr(27))
-                                        and (right<>re);
+                                        until (right<>left) and (right<>down) and (right<>up)
+                                        and (right<>chr(27)) and (right<>re);
                                 end;
                                 if ch5='5' then
                                 begin
@@ -804,8 +845,8 @@ begin
                                         repeat
                                                 re:=readkey;
                                                 if re=#0 then re:=readkey;
-                                        until (re<>right) and (re<>left) and (re<>down) and (re<>up) and (re<>chr(27));
-                                end;
+                                        until (re<>right) and (re<>left)
+                                        and (re<>down) and (re<>up) and (re<>chr(27));                                end;
                         until ch5=chr(27);
                 until ch4=chr(27);
                 if ch='4' then
@@ -815,8 +856,8 @@ begin
                                 modsintro(easy,hidden,hardrock,spunout,nofail,flashlight);
                                 repeat
                                         ch4:=readkey;
-                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s') or (ch4='n') or (ch4='f')
-                                or (ch4=chr(27)) or (ch4='1');
+                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s')
+                                or (ch4='n') or (ch4='f') or (ch4=chr(27)) or (ch4='1');
                                 if ch4='h' then hidden:=hidden*(-1);
                                 if ch4='e' then easy:=easy*(-1);
                                 if ch4='r' then hardrock:=hardrock*(-1);
@@ -938,10 +979,13 @@ begin
                       writeln('Press y to return to menu');
                       writeln('Press n to continue');
                       writeln('Press s to save your game and return to menu');
+                      if loaded=true then
+                      writeln('Press q to save and continue');
                       repeat
                             ch:=readkey;
-                      until (ch='y') or (ch='n') or (ch='s');
+                      until (ch='y') or (ch='n') or (ch='s') or (ch='q');
                 if (ch='y') or (ch='s') then break;
+                if ch='q' then save;
                 end;
                 if (lose(a,cs)=true) and (nofail=1) then continue;
            until (win(a,diff,cs)=true) or (lose(a,cs)=true);
@@ -972,11 +1016,11 @@ begin
                  if (ch='y') or (ch='s') then ch1:='y';
                  if (ch<>'y') and (ch<>'s') then
                  begin
-                      writeln('Wanna try again?');
-                      writeln('Hit y for yes');
-                      writeln('Hit n for no');
-                      ch1:=readkey;
+                      writeln('Hit ESC to return to menu');
+                      repeat
+                                ch1:=readkey;
+                      until ch1=chr(27);
                  end;
-           until (ch1='y') or (ch1='n');
+           until (ch1='y') or (ch1='n') or (ch1=chr(27));
      until ch1='n';
 end.
