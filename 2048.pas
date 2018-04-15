@@ -314,8 +314,12 @@ begin
         end
         else
                 if lose(a,cs)=false then
+                begin
+                        textbackground(txt);
                         for i:=1 to health(a,cs) do
-                                write('##');
+                                write('  ');
+                        textbackground(bg);
+                end;
                 for i:=1 to sqr(cs+1)-health(a,cs) do
                         write('  ');
         if lose(a,cs)=false then
@@ -361,22 +365,27 @@ begin
                         if color<>-1 then
                         begin
                                 textbackground(round(log2(a[i,j])));
-                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then
-                                   textbackground(round(log2(a[i,j])-1));
+                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then textbackground(round(log2(a[i,j])-1));
                         end;
-                        if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
-                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
-                        if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
+                        if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  ');
+                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
+                        if (a[i,j]>16) and (hidden=1) then
+                        begin
+                                textbackground(bg);
+                                write('  ','?','  ');
+                        end;
                         if (a[i,j]<10) and (hidden=-1) then
-                           write('  ',a[i,j],'  |');
+                           write('  ',a[i,j],'  ');
                         if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                           write('  ',a[i,j],' |');
+                           write('  ',a[i,j],' ');
                         if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                           write(' ',a[i,j],' |');
+                           write(' ',a[i,j],' ');
                         if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                           write(' ',a[i,j],'|');
+                           write(' ',a[i,j]);
                         if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                           write(a[i,j],'|');
+                           write(a[i,j]);
+                        textbackground(bg);
+                        write('|');
                    end;
                    if (a[i,j]=0) and (flashlight<>1) then write('     |');
                     if flashlight=1 then
@@ -389,25 +398,36 @@ begin
                                   if color<>-1 then
                                   begin
                                         textbackground(round(log2(a[i,j])));
-                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then
-                                           textbackground(round(log2(a[i,j])-1));
+                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then textbackground(round(log2(a[i,j])-1));
                                   end;
-                                  if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  |');
-                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' |');
-                                  if (a[i,j]>16) and (hidden=1) then write('  ','?','  |');
+                                  if (a[i,j]<=10) and (hidden=1) then write('  ',a[i,j],'  ');
+                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
+                                  if (a[i,j]>16) and (hidden=1) then
+                                  begin
+                                        textbackground(bg);
+                                        write('  ','?','  ');
+                                  end;
                                   if (a[i,j]<10) and (hidden=-1) then
-                                     write('  ',a[i,j],'  |');
+                                     write('  ',a[i,j],'  ');
                                   if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                                     write('  ',a[i,j],' |');
+                                     write('  ',a[i,j],' ');
                                   if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                                     write(' ',a[i,j],' |');
+                                     write(' ',a[i,j],' ');
                                   if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                                     write(' ',a[i,j],'|');
+                                     write(' ',a[i,j]);
                                   if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                                     write(a[i,j],'|');
+                                     write(a[i,j]);
+                                  textbackground(bg);
+                                  write('|');
                              end;
                         end
-                        else write('#####|');
+                        else
+                        begin
+                                textbackground(txt);
+                                write('     ');
+                                textbackground(bg);
+                                write('|');
+                        end;
                     end;
                     textbackground(bg);
           end;
@@ -523,7 +543,22 @@ begin
      reset(f);
      readln(f,fnum,fmove);
      readln(f,username);
+     readln(f,txt);
+     readln(f,bg);
+     readln(f,color);
+     readln(f,up);
+     readln(f,down);
+     readln(f,left);
+     readln(f,right);
+     readln(f,re);
      close(f);
+     if (bg=0) and (txt=0) then bg:=15;
+     if color=0 then color:=-1;
+     if up=#26 then up:='H';
+     if down=#26 then down:='P';
+     if left=#26 then left:='K';
+     if right=#26 then right:='M';
+     if re=#26 then re:='r';
 end;
 procedure writef1;
 var f:text;
@@ -532,6 +567,14 @@ begin
      rewrite(f);
      writeln(f,fnum,' ',fmove);
      writeln(f,username);
+     writeln(f,txt);
+     writeln(f,bg);
+     writeln(f,color);
+     writeln(f,up);
+     writeln(f,down);
+     writeln(f,left);
+     writeln(f,right);
+     writeln(f,re);
      close(f);
 end;
 function maxnum(a:mang;cs:byte):longint;
@@ -550,6 +593,14 @@ begin
      rewrite(f);
      writeln(f,point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1),' ',maxnum(a,cs));
      writeln(f,username);
+     writeln(f,txt);
+     writeln(f,bg);
+     writeln(f,color);
+     writeln(f,up);
+     writeln(f,down);
+     writeln(f,left);
+     writeln(f,right);
+     writeln(f,re);
      close(f);
 end;
 procedure save;
@@ -647,7 +698,7 @@ begin
      write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.0',s-13);
+     calibrate('Update 4.0.1',s-11);
      writeln;
      for i:=1 to (s-24) div 2 do
      write(' ');
@@ -707,7 +758,7 @@ begin
         writeln;
         calibrate('Hit 1 to use night mode',s);
         calibrate('Hit 2 to use classic mode',s);
-        {calibrate('Hit 3 to trigger widescreen mode',s);}
+        calibrate('Hit 3 to trigger widescreen mode',s);
         calibrate('Hit 4 to change username',s);
         calibrate('Hit 5 to change keyboard bindings',s);
         if color=-1 then calibrate('Hit 6 to turn on color',s)
@@ -749,12 +800,13 @@ begin
 end;
 begin
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
-     ch3:='1';ch2:='1';diff:=512;up:=#72;down:=#80;left:=#75;right:=#77;re:='r';
+     ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
      bg:=15;txt:=0;color:=-1;
-     textcolor(txt);
-     textbackground(bg);
      repeat
            count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
+           textcolor(txt);
+           textbackground(bg);
+           lowvideo;
            repeat
                 if username='' then username:='Player';
                 case wide of
@@ -767,33 +819,39 @@ begin
                 until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6');
                 if ch='2' then
                 repeat
-                        {case wide of
+                        case wide of
                                 true:s:=120;
                                 false:s:=80;
-                        end;}
+                        end;
                         menu4;
                         repeat
                                 ch4:=readkey;
-                        until (ch4='1') or (ch4='2') {or (ch4='3')} or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6');
+                        until (ch4='1') or (ch4='2') or (ch4='3') or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6');
                         if ch4='1' then
                         begin
                                 bg:=0;txt:=15;
                                 textcolor(txt);
                                 textbackground(bg);
                                 lowvideo;
+                                writef1;
                         end;
                         if ch4='2' then
                         begin
                                 bg:=15;txt:=0;
                                 textcolor(txt);
                                 textbackground(bg);
+                                writef1;
                         end;
-                        {if ch4='3' then
+                        if ch4='3' then
                         case s of
                                 80:wide:=true;
                                 120:wide:=false;
-                        end;}
-                        if ch4='6' then color:=color*-1;
+                        end;
+                        if ch4='6' then
+                        begin
+                                color:=color*-1;
+                                writef1;
+                        end;
                         if ch4='4' then
                         begin
                                 writeln('Type your new username');
@@ -812,6 +870,7 @@ begin
                                         repeat
                                                 up:=readkey;
                                                 if up=#0 then up:=readkey;
+                                                writef1;
                                         until (up<>chr(27)) and (up<>down) and (up<>left) and (up<>right) and (up<>re);
                                 end;
                                 if ch5='2' then
@@ -820,6 +879,7 @@ begin
                                         repeat
                                                 down:=readkey;
                                                 if down=#0 then down:=readkey;
+                                                writef1;
                                         until (down<>up) and (down<>chr(27)) and (down<>left) and (down<>right) and (down<>re);
                                 end;
                                 if ch5='3' then
@@ -828,6 +888,7 @@ begin
                                         repeat
                                                 left:=readkey;
                                                 if left=#0 then left:=readkey;
+                                                writef1;
                                         until (left<>down) and (left<>up) and (left<>chr(27)) and (left<>right) and (left<>re);
                                 end;
                                 if ch5='4' then
@@ -836,8 +897,8 @@ begin
                                         repeat
                                                 right:=readkey;
                                                 if right=#0 then right:=readkey;
-                                        until (right<>left) and (right<>down) and (right<>up)
-                                        and (right<>chr(27)) and (right<>re);
+                                                writef1;
+                                        until (right<>left) and (right<>down) and (right<>up) and (right<>chr(27)) and (right<>re);
                                 end;
                                 if ch5='5' then
                                 begin
@@ -845,8 +906,8 @@ begin
                                         repeat
                                                 re:=readkey;
                                                 if re=#0 then re:=readkey;
-                                        until (re<>right) and (re<>left)
-                                        and (re<>down) and (re<>up) and (re<>chr(27));                                end;
+                                                writef1;
+                                        until (re<>right) and (re<>left) and (re<>down) and (re<>up) and (re<>chr(27));                                end;
                         until ch5=chr(27);
                 until ch4=chr(27);
                 if ch='4' then
@@ -856,8 +917,7 @@ begin
                                 modsintro(easy,hidden,hardrock,spunout,nofail,flashlight);
                                 repeat
                                         ch4:=readkey;
-                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s')
-                                or (ch4='n') or (ch4='f') or (ch4=chr(27)) or (ch4='1');
+                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s') or (ch4='n') or (ch4='f') or (ch4=chr(27)) or (ch4='1');
                                 if ch4='h' then hidden:=hidden*(-1);
                                 if ch4='e' then easy:=easy*(-1);
                                 if ch4='r' then hardrock:=hardrock*(-1);
@@ -930,7 +990,11 @@ begin
            end;
            if loaded=false then
               if easy=1 then cs:=4 else cs:=3;
-           if ch=chr(27) then begin clrscr; exit; end;
+           if ch=chr(27) then
+           begin
+                clrscr;
+                exit;
+           end;
            if loaded=false then
               val(ch3,diff1,code);
            val(ch2,difftotal,code);
