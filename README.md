@@ -1,5 +1,3 @@
 # 2048
-this is a game written by pascal
-by a single person
-,runs on DOS and Windows.
-By default,you use up/down/left/right to move,r key to rewind
+This is a game written in Pascal by a single person, and it is inspired by Gabriele Cirulli's 2048. It runs in command line.  
+By default, you use up/down/left/right arrows to move, R key to rewind.

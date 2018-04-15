@@ -930,7 +930,7 @@ begin
            end;
            if loaded=false then
               if easy=1 then cs:=4 else cs:=3;
-           if ch=chr(27) then exit;
+           if ch=chr(27) then clrscr; exit;
            if loaded=false then
               val(ch3,diff1,code);
            val(ch2,difftotal,code);
