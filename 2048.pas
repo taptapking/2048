@@ -1,13 +1,56 @@
 uses crt;
 type mang=array[0..10,0..10] of longint;
 var a,c:mang;
-        i,j,diff,diff1,difftotal,code,count:word;
+        i,j,diff,diff1,difftotal,code,c1,count:word;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re:char;
         fmove,fnum,bg,txt:longint;
         moved,loaded,wide:boolean;
         hidden,hardrock,spunout,nofail,easy,flashlight,color:shortint;
         cs,s:byte;
         username:string;
+procedure title;
+begin
+        clrscr;
+        for i:=1 to s-1 do
+                write('-');
+        writeln;
+        if diff1=0 then
+        begin
+                for i:=1 to (s-9) div 2  do
+                        write(' ');
+                writeln('EASY ',diff);
+        end;
+        if diff1=1 then
+        begin
+                for i:=1 to (s-11) div 2  do
+                        write(' ');
+                writeln('NORMAL ',diff);
+        end;
+        if diff1=2 then
+        begin
+                for i:=1 to (s-9) div 2  do
+                        write(' ');
+                writeln('HARD ',diff);
+        end;
+        if diff1=3 then
+        begin
+                for i:=1 to (s-14) div 2  do
+                        write(' ');
+                writeln('VERY HARD ',diff);
+        end;
+        if diff1=4 then
+        begin
+                for i:=1 to (s-11) div 2  do
+                        write(' ');
+                writeln('MASTER ',diff);
+        end;
+        for i:=1 to s-1 do
+                write('-');
+        writeln;
+        for i:=1 to difftotal do
+                write('* ');
+        writeln;
+end;
 function log2(a:longint):integer;
 var c:integer;
 begin
@@ -18,6 +61,14 @@ begin
                 c:=c+1;
         end;
         log2:=c;
+end;
+function pow2(a:byte):longint;
+var i,c:integer;
+begin
+        c:=1;
+        for i:=1 to a do
+        c:=c*2;
+        pow2:=c;
 end;
 procedure calibrate(st:string;s:byte);
 var k:byte;
@@ -256,46 +307,6 @@ end;
 procedure printf;
 var i,j,k:byte;
 begin
-     for i:=1 to s-1 do
-         write('-');
-     writeln;
-     if diff1=0 then
-     begin
-          for i:=1 to (s-9) div 2  do
-              write(' ');
-          writeln('EASY ',diff);
-     end;
-     if diff1=1 then
-     begin
-          for i:=1 to (s-11) div 2  do
-              write(' ');
-          writeln('NORMAL ',diff);
-     end;
-     if diff1=2 then
-     begin
-          for i:=1 to (s-9) div 2  do
-              write(' ');
-          writeln('HARD ',diff);
-     end;
-     if diff1=3 then
-     begin
-          for i:=1 to (s-14) div 2  do
-              write(' ');
-          writeln('VERY HARD ',diff);
-     end;
-     if diff1=4 then
-     begin
-          for i:=1 to (s-11) div 2  do
-              write(' ');
-          writeln('MASTER ',diff);
-     end;
-     for i:=1 to s-1 do
-         write('-');
-     writeln;
-     for i:=1 to difftotal do
-         write('* ');
-     writeln;
-
      if nofail<>1 then
      begin
         for i:=1 to sqr(cs+1) do
@@ -698,7 +709,7 @@ begin
      write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.0.1',s-11);
+     calibrate('Update 4.0.2',s-11);
      writeln;
      for i:=1 to (s-24) div 2 do
      write(' ');
@@ -946,19 +957,9 @@ begin
                         repeat
                                 ch2:=readkey;
                         until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or (ch2='6');
-                        if ch2='1' then
-                                diff:=512;
-                        if ch2='2' then
-                                diff:=1024;
-                        if ch2='3' then
-                                diff:=2048;
-                        if ch2='4' then
-                                diff:=4096;
-                        if ch2='5' then
-                                diff:=8192;
-                        if ch2='6' then
-                                diff:=16384;
-                        if ch2='0' then
+                        val(ch2,c1,code);
+                        if c1>0 then diff:=pow2(c1+8);
+                        if c1=0 then
                                 diff:=1;
                 end;
                 if ch='6' then
@@ -973,19 +974,9 @@ begin
            begin
                 load;
                 loaded:=true;
-                if ch2='1' then
-                        diff:=512;
-                if ch2='2' then
-                        diff:=1024;
-                if ch2='3' then
-                        diff:=2048;
-                if ch2='4' then
-                        diff:=4096;
-                if ch2='5' then
-                        diff:=8192;
-                if ch2='6' then
-                        diff:=16384;
-                if ch2='0' then
+                val(ch2,c1,code);
+                if c1>0 then diff:=pow2(c1+8);
+                if c1=0 then
                         diff:=1;
            end;
            if loaded=false then
@@ -1009,8 +1000,9 @@ begin
                         a[i,j]:=0;
                         start;
            end;
+           title;
            repeat
-                 clrscr;
+                 gotoxy(1,5);
                  printf;
                  repeat
                         ch:=readkey;
@@ -1048,8 +1040,13 @@ begin
                       repeat
                             ch:=readkey;
                       until (ch='y') or (ch='n') or (ch='s') or (ch='q');
-                if (ch='y') or (ch='s') then break;
-                if ch='q' then save;
+                      if (ch='y') or (ch='s') then break;
+                      if ch='q' then
+                      begin
+                        save;
+                        title;
+                      end;
+                      if ch='n' then title;
                 end;
                 if (lose(a,cs)=true) and (nofail=1) then continue;
            until (win(a,diff,cs)=true) or (lose(a,cs)=true);
@@ -1060,21 +1057,17 @@ begin
                  begin
                       flashlight:=-1;
                       hidden:=-1;
-                      clrscr;
+                      title;
                       printf;
                       writeln('YOU WON');
-                      {if loaded=true then
-                         cleargame;}
                  end;
                  if lose(a,cs)=true then
                  begin
                       flashlight:=-1;
                       hidden:=-1;
-                      clrscr;
+                      title;
                       printf;
                       writeln('YOU LOST');
-                      {if loaded=true then
-                         cleargame;}
                  end;
                  if ch='s' then save;
                  if (ch='y') or (ch='s') then ch1:='y';
