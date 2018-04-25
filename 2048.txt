@@ -1,0 +1,13 @@
+                         1.0  2.0  2.1  2.11 2.2  3.0  3.01 3.1 3.11 4.0 4.0.1 4.1
+----------------------------------------------------------------------------------
+Redesigned menu+savegame |X|  |O|  |O|  |O|  |O|  |O|  |O|  |O|  |O| |O|  |O|  |O|
+Hidden mod               |X|  |X|  |O|  |O|  |O|  |O|  |O|  |O|  |O| |O|  |O|  |O|
+Wide+classic combined    |X|  |X|  |X|  |O|  |O|  |O|  |O|  |O|  |O| |O|  |O|  |O|
+Easy+Hard rock mod       |X|  |X|  |X|  |X|  |O|  |O|  |O|  |O|  |O| |O|  |O|  |O|
+Redesigned UI+NF+SO      |X|  |X|  |X|  |X|  |X|  |O|  |O|  |O|  |O| |O|  |O|  |O|
+NF ranked                |X|  |X|  |X|  |X|  |X|  |X|  |O|  |O|  |O| |O|  |O|  |O|
+Flashlight mod           |X|  |X|  |X|  |X|  |X|  |X|  |X|  |O|  |O| |O|  |O|  |O|
+Improved performance     |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X|  |O| |O|  |O|  |O|
+Redesigned mod+key change|X|  |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X| |O|  |O|  |O|
+settings saved           |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X| |X|  |O|  |O|
+enhanced FL+sound        |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X|  |X| |X|  |X|  |O|
