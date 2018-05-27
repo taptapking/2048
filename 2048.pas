@@ -787,7 +787,7 @@ begin
      write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.1',s-13);
+     calibrate('Update 4.2',s-13);
      writeln;
      for i:=1 to (s-24) div 2 do
      write(' ');
@@ -1165,6 +1165,17 @@ begin
                       title;
                       printf;
                       writeln('YOU WON');
+                      if soun=1 then
+                      begin
+                           delay(150);
+                           sound(1000);
+                           delay(150);
+                           nosound;
+                           delay(50);
+                           sound(1000);
+                           delay(600);
+                           nosound;
+                      end;
                  end;
                  if lose(a,cs)=true then
                  begin
@@ -1173,6 +1184,23 @@ begin
                       title;
                       printf;
                       writeln('YOU LOST');
+                      if soun=1 then
+                      begin
+                         delay(150);
+                         sound(262);
+                         delay(250);
+                         sound(147);
+                         delay(250);
+                         sound(262);
+                         delay(200);
+                         sound(196);
+                         delay(200);
+                         nosound;
+                         delay(500);
+                         sound(131);
+                         delay(520);
+                         nosound;
+                      end;
                  end;
                  if ch='s' then save;
                  if (ch='y') or (ch='s') then ch1:='y';
