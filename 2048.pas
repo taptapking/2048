@@ -16,7 +16,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
-program 2048;
 uses crt;
 type mang=array[0..10,0..10] of longint;
 var a,c:mang;
@@ -787,7 +786,7 @@ begin
      write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.2',s-13);
+     calibrate('Update 4.2.1',s-11);
      writeln;
      for i:=1 to (s-24) div 2 do
      write(' ');
@@ -1168,13 +1167,31 @@ begin
                       if soun=1 then
                       begin
                            delay(150);
-                           sound(1000);
-                           delay(150);
+                           Sound(650);
+                           Delay(600);
+                           NoSound;
+
+                           Delay(180);
+                           Sound(500);
+                           Delay(150);
+
+                           Sound(570);
+                           Delay(150);
+
+                           Sound(640);
+                           Delay(150);
+
+                           Sound(570);
+                           Delay(150);
+                           NoSound;
+
+                           Delay(200);
+                           Sound(770);
+                           Delay(150);
                            nosound;
-                           delay(50);
-                           sound(1000);
-                           delay(600);
-                           nosound;
+                           Sound(770);
+                           Delay(200);
+                           NoSound;
                       end;
                  end;
                  if lose(a,cs)=true then
