@@ -1,12 +1,23 @@
 PC=fpc
 PFLAGS= -O3
 OBJECTS= 2048.pas
-n32= 2048_i386
-n64= 2048_x86_64
-Param32= -o"$(n32).exe" -Pi386
-Param64= -o"$(n64).exe" -Px86_64
 
-all: x32 x64
+ifeq ($(OS),Windows_NT)
+	name=2048.exe
+else
+	name=2048
+endif
+
+PFLAGS+= -o"$(name)"
+
+Param32= -Pi386
+Param64= -Px86_64
+
+all: auto
+
+auto:   $(OBJECTS)
+	$(PC) $(PFLAGS) $(OBJECTS)
+	$(RM) *.o
 
 x32:	$(OBJECTS)
 	$(PC) $(PFLAGS) $(Param32) $(OBJECTS)
