@@ -133,22 +133,32 @@ begin
         for i:=1 to (s-40) div 2 do
                 write(' ');
         write('Difficulty reduction:    ');
-        if ez1=1 then write('EZ   ') else write('ez   ');
-        if nf1=1 then write('NF   ') else write('nf   ');
+        if color<>-1 then textbackground(2);
+        if ez1=1 then write('EZ') else write('ez');
+        if color<>-1 then textbackground(bg);write('   ');
+        if color<>-1 then textbackground(1);
+        if nf1=1 then write('NF') else write('nf');
+        if color<>-1 then textbackground(bg);
         writeln;
         writeln;
         for i:=1 to (s-40) div 2 do
                 write(' ');
         write('Difficulty increase:     ');
-        if hr1=1 then write('HR   ') else write('hr   ');
-        if hd1=1 then write('HD   ') else write('hd   ');
+        if color<>-1 then textbackground(4);
+        if hr1=1 then write('HR') else write('hr');
+        if color<>-1 then textbackground(bg);write('   ');
+        if color<>-1 then textbackground(6);
+        if hd1=1 then write('HD') else write('hd');
+        if color<>-1 then textbackground(bg);write('   ');
         if fl1=1 then write('FL   ') else write('fl   ');
         writeln;
         writeln;
         for i:=1 to (s-40) div 2 do
                 write(' ');
         write('Special:                 ');
+        if color<>-1 then textbackground(3);
         if so1=1 then write('SO') else write('so');
+        if color<>-1 then textbackground(bg);
         writeln;
         writeln;
         for i:=1 to (s-40) div 2 do
@@ -320,6 +330,7 @@ begin
      for i:=0 to cs do
          for j:=0 to cs do
              if a[i,j]=0 then count:=count+1;
+     if count>sqr(cs+1) then count:=sqr(cs+1);
      health:=count;
 end;
 procedure printf;
@@ -330,7 +341,7 @@ begin
      begin
         for i:=1 to sqr(cs+1) do
             write('--');
-        write('|');
+        write(':');
         writeln;
         if color<>-1 then
         begin
@@ -358,9 +369,9 @@ begin
         for i:=2 to (s-sqr(cs+1)*2-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1))) do
             write(' ');
         writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
-        for i:=1 to sqr(cs+1) do
-            write('--');
-        write('|');
+        for i:=1 to sqr(cs+1)-1 do
+            write('__');
+        write('_/');
         writeln;
      end
      else
@@ -382,11 +393,41 @@ begin
      if flashlight=1 then k1:=k1+3;
      for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
          write(' ');
-     if cs>=4 then write('EZ ');
-     if nofail=1 then write('NF ');
-     if spunout=1 then write('SO ');
-     if hidden=1 then write('HD ');
-     if hardrock=1 then write('HR ');
+     if cs>=4 then
+     begin
+        if color<>-1 then textbackground(2);
+        write('EZ');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if nofail=1 then
+     begin
+        if color<>-1 then textbackground(1);
+        write('NF');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if spunout=1 then
+     begin
+        if color<>-1 then textbackground(3);
+        write('SO');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if hidden=1 then
+     begin
+        if color<>-1 then textbackground(6);
+        write('HD');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if hardrock=1 then
+     begin
+        if color<>-1 then textbackground(4);
+        write('HR');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
      if flashlight=1 then write('FL');
      writeln;
      for i:=0 to cs do
@@ -780,25 +821,24 @@ begin
      end;
      calibrate('Hit 4 to use mods',s-6);
      for i:=1 to (s-24) div 2 do
-     write(' ');
+        write(' ');
      write('Hit 5 to change final score ');writeln('(',diff,')');
      for i:=1 to (s-24) div 2 do
-     write(' ');
+        write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.2.1',s-11);
+     calibrate('Update 4.3',s-13);
      writeln;
      for i:=1 to (s-24) div 2 do
-     write(' ');
+        write(' ');
      writeln(username);
      for i:=1 to (s-24) div 2 do
-     write(' ');
+        write(' ');
      write('Score:',fnum);
      writeln;
      for i:=1 to (s-24) div 2 do
-     write(' ');
+        write(' ');
      write('Max number:',fmove);
-
 end;
 procedure menu2;
 var k:byte;
@@ -844,18 +884,19 @@ begin
         calibrate('User preferences',s);
         for i:=1 to s-1 do write('-');
         writeln;
-        calibrate('Hit 1 to use dark theme',s);
-        calibrate('Hit 2 to use light theme',s);
-        calibrate('Hit 3 to toggle widescreen mode',s);
-        calibrate('Hit 4 to change username',s);
-        calibrate('Hit 5 to change keyboard bindings',s);
-        if color=-1 then calibrate('Hit 6 to turn on color',s)
-        else calibrate('Hit 6 to turn off color',s);
-        if efl=1 then calibrate('Hit 7 to turn off enhanced flashlight',s)
-        else calibrate('Hit 7 to turn on enhanced flashlight',s);
-        if soun=1 then calibrate('Hit 8 to turn off sound',s)
-        else calibrate('Hit 8 to turn on sound',s);
-        calibrate('Hit esc to exit',s);
+        calibrate('Hit 1 to use dark theme',s-11);
+        calibrate('Hit 2 to use light theme',s-10);
+        calibrate('Hit 3 to toggle widescreen mode',s-3);
+        calibrate('Hit 4 to change username',s-10);
+        calibrate('Hit 5 to change keyboard bindings',s-1);
+        if color=-1 then calibrate('Hit 6 to turn on color',s-11)
+        else calibrate('Hit 6 to turn off color',s-10);
+        if efl=1 then calibrate('Hit 7 to turn off enhanced flashlight',s+4)
+        else calibrate('Hit 7 to turn on enhanced flashlight',s+3);
+        if soun=1 then calibrate('Hit 8 to turn off sound',s-11)
+        else calibrate('Hit 8 to turn on sound',s-11);
+        writeln;
+        calibrate('Hit esc to exit',s-18);
 end;
 procedure menu5;
 var k:byte;
