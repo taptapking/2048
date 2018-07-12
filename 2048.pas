@@ -23,9 +23,52 @@ var a,c:mang;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re:char;
         fmove,fnum,bg,txt,soun:longint;
         moved,loaded,wide:boolean;
-        hidden,hardrock,spunout,nofail,easy,flashlight,color,efl:shortint;
+        hidden,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx:shortint;
         cs,s,x,y:byte;
         username:string;
+procedure titlegfx;
+begin
+        clrscr;
+        for i:=1 to s-1 do
+                write(chr(196));
+        writeln;
+        if diff1=0 then
+        begin
+                for i:=1 to (s-9) div 2  do
+                        write(' ');
+                writeln('EASY ',diff);
+        end;
+        if diff1=1 then
+        begin
+                for i:=1 to (s-11) div 2  do
+                        write(' ');
+                writeln('NORMAL ',diff);
+        end;
+        if diff1=2 then
+        begin
+                for i:=1 to (s-9) div 2  do
+                        write(' ');
+                writeln('HARD ',diff);
+        end;
+        if diff1=3 then
+        begin
+                for i:=1 to (s-14) div 2  do
+                        write(' ');
+                writeln('VERY HARD ',diff);
+        end;
+        if diff1=4 then
+        begin
+                for i:=1 to (s-11) div 2  do
+                        write(' ');
+                writeln('MASTER ',diff);
+        end;
+        for i:=1 to s-1 do
+                write(chr(196));
+        writeln;
+        for i:=1 to difftotal do
+                write('* ');
+        writeln;
+end;
 procedure title;
 begin
         clrscr;
@@ -653,6 +696,237 @@ begin
                 end;
      move(c);
 end;
+procedure printfgfx;
+var i,j,k,k1:byte;
+begin
+     k1:=0;
+     if nofail<>1 then
+     begin
+        for i:=1 to sqr(cs+1) do
+            write(chr(196),chr(196));
+        write(chr(191));
+        writeln;
+        if color<>-1 then
+        begin
+                if (health(a,cs)>sqr(cs-1)*2) and (health(a,cs)<=sqr(cs-1)*4) then textbackground(2);
+                if (health(a,cs)>sqr(cs-1)) and (health(a,cs)<=sqr(cs-1)*2) then textbackground(3);
+                if (health(a,cs)<=sqr(cs-1)) then textbackground(4);
+                if lose(a,cs)=false then
+                        for i:=1 to health(a,cs) do
+                                write('  ');
+                        textbackground(bg);
+        end
+        else
+                if lose(a,cs)=false then
+                begin
+                        textbackground(txt);
+                        for i:=1 to health(a,cs) do
+                                write('  ');
+                        textbackground(bg);
+                end;
+                for i:=1 to sqr(cs+1)-health(a,cs) do
+                        write('  ');
+        if lose(a,cs)=false then
+           write(chr(179))
+           else write('  ',chr(179));
+        for i:=2 to (s-sqr(cs+1)*2-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1))) do
+            write(' ');
+        writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
+        for i:=1 to sqr(cs+1) do
+            write(chr(196),chr(196));
+        write(chr(217));
+        writeln;
+     end
+     else
+     begin
+          for k:=1 to s-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) do
+              write(' ');
+          writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
+     end;
+     for k:=2 to (s-6*(cs+1)) div 2 do
+         write(' ');
+     write(chr(218));
+     for k:=1 to cs+1 do
+         write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
+     if cs>=4 then k1:=k1+3;
+     if nofail=1 then k1:=k1+3;
+     if spunout=1 then k1:=k1+3;
+     if hidden=1 then k1:=k1+3;
+     if hardrock=1 then k1:=k1+3;
+     if flashlight=1 then k1:=k1+3;
+     for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
+         write(' ');
+     if cs>=4 then
+     begin
+        if color<>-1 then textbackground(2);
+        write('EZ');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if nofail=1 then
+     begin
+        if color<>-1 then textbackground(1);
+        write('NF');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if spunout=1 then
+     begin
+        if color<>-1 then textbackground(3);
+        write('SO');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if hidden=1 then
+     begin
+        if color<>-1 then textbackground(6);
+        write('HD');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if hardrock=1 then
+     begin
+        if color<>-1 then textbackground(4);
+        write('HR');
+        if color<>-1 then textbackground(bg);
+        write(' ');
+     end;
+     if flashlight=1 then write('FL');
+     writeln;
+     for i:=0 to cs do
+     begin
+          for k:=2 to (s-6*(cs+1)) div 2 do
+              write(' ');
+          write(chr(179));
+          for j:=0 to cs do
+          begin
+                   if (a[i,j]<>0) and (flashlight<>1) then
+                   begin
+                        if color<>-1 then
+                        begin
+                                textbackground(round(log2(a[i,j])));
+                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                then textbackground(round(log2(a[i,j])-1));
+                        end;
+                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
+                        if (a[i,j]>16) and (hidden=1) then
+                        begin
+                                textbackground(bg);
+                                write('  ','?','  ');
+                        end;
+                        if a[i,j]<10 then
+                           write('  ',a[i,j],'  ');
+                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
+                           write('  ',a[i,j],' ');
+                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
+                           write(' ',a[i,j],' ');
+                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
+                           write(' ',a[i,j]);
+                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
+                           write(a[i,j]);
+                        textbackground(bg);
+                        write(chr(179));
+                   end;
+                   if (a[i,j]=0) and (flashlight<>1) then write('     ',chr(179));
+                    if (flashlight=1) and (efl=1) then
+                    begin
+                        if (x-1<=i) and (i<=x+1) and (y-1<=j) and (j<=y+1) then
+                        begin
+                                if a[i,j]=0 then
+                                        write('     ',chr(179))
+                                else
+                                begin
+                                        if color<>-1 then
+                                        begin
+                                                textbackground(round(log2(a[i,j])));
+                                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                                then textbackground(round(log2(a[i,j])-1));
+                                        end;
+                                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
+                                        if (a[i,j]>16) and (hidden=1) then
+                                        begin
+                                                textbackground(bg);
+                                                write('  ','?','  ');
+                                        end;
+                                        if a[i,j]<10 then
+                                                write('  ',a[i,j],'  ');
+                                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
+                                                write('  ',a[i,j],' ');
+                                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
+                                                write(' ',a[i,j],' ');
+                                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
+                                                write(' ',a[i,j]);
+                                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
+                                                write(a[i,j]);
+                                        textbackground(bg);
+                                        write(chr(179));
+                                end;
+                        end
+                        else
+                        begin
+                                textbackground(txt);
+                                write('     ');
+                                textbackground(bg);
+                                write(chr(179));
+                        end;
+                   end;
+
+                    if (flashlight=1) and (efl=-1) then
+                    begin
+                        if ((health(a,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a,cs)<=2) and (i>=2) and (j<=cs-2)) then
+                        begin
+                             if a[i,j]=0 then write('     ',chr(179));
+                             if a[i,j]<>0 then
+                             begin
+                                  if color<>-1 then
+                                  begin
+                                        textbackground(round(log2(a[i,j])));
+                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                        then textbackground(round(log2(a[i,j])-1));
+                                  end;
+                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
+                                  if (a[i,j]>16) and (hidden=1) then
+                                  begin
+                                        textbackground(bg);
+                                        write('  ','?','  ');
+                                  end;
+                                  if a[i,j]<10 then
+                                     write('  ',a[i,j],'  ');
+                                  if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
+                                     write('  ',a[i,j],' ');
+                                  if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
+                                     write(' ',a[i,j],' ');
+                                  if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
+                                     write(' ',a[i,j]);
+                                  if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
+                                     write(a[i,j]);
+                                  textbackground(bg);
+                                  write(chr(179));
+                             end;
+                        end
+                        else
+                        begin
+                                textbackground(txt);
+                                write('     ');
+                                textbackground(bg);
+                                write(chr(179));
+                        end;
+                    end;
+                    textbackground(bg);
+          end;
+          writeln;
+          if i<=cs then
+          begin
+               for  k:=2 to (s-6*(cs+1)) div 2 do
+                   write(' ');
+               write(chr(195));
+               for k:=1 to cs do
+                   write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
+               writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
+          end;
+     end;
+     writeln('Moves:',count);
+end;
 procedure readf;
 var f:text;
 begin
@@ -670,6 +944,7 @@ begin
      readln(f,re);
      readln(f,efl);
      readln(f,soun);
+     readln(f,gfx);
      close(f);
      if (bg=0) and (txt=0) then bg:=15;
      if color=0 then color:=-1;
@@ -680,6 +955,7 @@ begin
      if re=#26 then re:='r';
      if efl=0 then efl:=-1;
      if soun=0 then soun:=-1;
+     if gfx=0 then gfx:=-1;
 end;
 procedure writef1;
 var f:text;
@@ -698,6 +974,7 @@ begin
      writeln(f,re);
      writeln(f,efl);
      writeln(f,soun);
+     writeln(f,gfx);
      close(f);
 end;
 function maxnum(a:mang;cs:byte):longint;
@@ -726,6 +1003,7 @@ begin
      writeln(f,re);
      writeln(f,efl);
      writeln(f,soun);
+     writeln(f,gfx);
      close(f);
 end;
 procedure save;
@@ -827,7 +1105,7 @@ begin
         write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.3',s-13);
+     calibrate('Update 4.4',s-13);
      writeln;
      for i:=1 to (s-24) div 2 do
         write(' ');
@@ -895,6 +1173,8 @@ begin
         else calibrate('Hit 7 to turn on enhanced flashlight',s+3);
         if soun=1 then calibrate('Hit 8 to turn off sound',s-11)
         else calibrate('Hit 8 to turn on sound',s-11);
+        if gfx=1 then calibrate('Hit 9 to turn on low settings',s-4)
+        else calibrate('Hit 9 to turn on high settings',s-4);
         writeln;
         calibrate('Hit esc to exit',s-18);
 end;
@@ -934,7 +1214,7 @@ end;
 begin
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
-     bg:=15;txt:=0;color:=-1;efl:=-1;soun:=-1;
+     bg:=15;txt:=0;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
      repeat
            count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
            textcolor(txt);
@@ -959,7 +1239,7 @@ begin
                         menu4;
                         repeat
                                 ch4:=readkey;
-                        until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='3') or (ch4='7') or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6');
+                        until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='3') or (ch4='7') or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9');
                         if ch4='1' then
                         begin
                                 bg:=0;txt:=15;
@@ -993,6 +1273,11 @@ begin
                         if ch4='8' then
                         begin
                                 soun:=soun*-1;
+                                writef1;
+                        end;
+                        if ch4='9' then
+                        begin
+                                gfx:=gfx*-1;
                                 writef1;
                         end;
                         if ch4='4' then
@@ -1135,10 +1420,10 @@ begin
                         a[i,j]:=0;
                         start;
            end;
-           title;
+           if gfx<>1 then title else titlegfx;
            repeat
                  gotoxy(1,5);
-                 printf;
+                 if gfx<>1 then printf else printfgfx;
                  repeat
                         ch:=readkey;
                  until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27));
@@ -1180,7 +1465,6 @@ begin
                       writeln('Press y to return to menu');
                       writeln('Press n to continue');
                       writeln('Press s to save your game and return to menu');
-                      if loaded=true then
                       writeln('Press q to save and continue');
                       repeat
                             ch:=readkey;
@@ -1189,9 +1473,10 @@ begin
                       if ch='q' then
                       begin
                         save;
-                        title;
+                        if gfx<>1 then title else titlegfx;
                       end;
-                      if ch='n' then title;
+                      if ch='n' then
+                        if gfx<>1 then title else titlegfx;
                 end;
                 if (lose(a,cs)=true) and (nofail=1) then continue;
            until (win(a,diff,cs)=true) or (lose(a,cs)=true);
