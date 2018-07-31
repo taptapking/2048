@@ -2,17 +2,14 @@
     2048 - A game based on Gabriele Cirulli's 2048 (the official 2048).
     
     Copyright (C) 2017-2018 Le Ngoc Dang Khoa <lethanhbinhkts@gmail.com>
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
@@ -193,7 +190,7 @@ begin
         if color<>-1 then textbackground(6);
         if hd1=1 then write('HD') else write('hd');
         if color<>-1 then textbackground(bg);write('   ');
-        if fl1=1 then write('FL   ') else write('fl   ');
+        if fl1=1 then write('FL') else write('fl');
         writeln;
         writeln;
         for i:=1 to (s-40) div 2 do
@@ -485,7 +482,8 @@ begin
                         if color<>-1 then
                         begin
                                 textbackground(round(log2(a[i,j])));
-                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then textbackground(round(log2(a[i,j])-1));
+                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                then textbackground(round(log2(a[i,j])-1));
                         end;
                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
                         if (a[i,j]>16) and (hidden=1) then
@@ -518,7 +516,8 @@ begin
                                         if color<>-1 then
                                         begin
                                                 textbackground(round(log2(a[i,j])));
-                                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then textbackground(round(log2(a[i,j])-1));
+                                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                                then textbackground(round(log2(a[i,j])-1));
                                         end;
                                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
                                         if (a[i,j]>16) and (hidden=1) then
@@ -559,7 +558,8 @@ begin
                                   if color<>-1 then
                                   begin
                                         textbackground(round(log2(a[i,j])));
-                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt) then textbackground(round(log2(a[i,j])-1));
+                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                        then textbackground(round(log2(a[i,j])-1));
                                   end;
                                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
                                   if (a[i,j]>16) and (hidden=1) then
@@ -945,6 +945,7 @@ begin
      readln(f,efl);
      readln(f,soun);
      readln(f,gfx);
+     readln(f,s);
      close(f);
      if (bg=0) and (txt=0) then bg:=15;
      if color=0 then color:=-1;
@@ -956,6 +957,7 @@ begin
      if efl=0 then efl:=-1;
      if soun=0 then soun:=-1;
      if gfx=0 then gfx:=-1;
+     if s=0 then s:=80;
 end;
 procedure writef1;
 var f:text;
@@ -975,6 +977,7 @@ begin
      writeln(f,efl);
      writeln(f,soun);
      writeln(f,gfx);
+     writeln(f,s);
      close(f);
 end;
 function maxnum(a:mang;cs:byte):longint;
@@ -1004,6 +1007,7 @@ begin
      writeln(f,efl);
      writeln(f,soun);
      writeln(f,gfx);
+     writeln(f,s);
      close(f);
 end;
 procedure save;
@@ -1090,31 +1094,31 @@ begin
      for k:=1 to s-1 do
          write('-');
      writeln;
-     calibrate('Hit 1 to start a game',s-2);
-     calibrate('Hit 2 to access user preferences',s+8);
+     calibrate('Hit 1 to start a game',s-10);
+     calibrate('Hit 2 to access user preferences',s);
      if checkfile('save.txt')=true then
      begin
-          calibrate('Hit 3 to load your game',s-1);
-          calibrate('Hit d to clear your game',s);
+          calibrate('Hit 3 to load your game',s-9);
+          calibrate('Hit d to clear your game',s-8);
      end;
-     calibrate('Hit 4 to use mods',s-6);
-     for i:=1 to (s-24) div 2 do
+     calibrate('Hit 4 to use mods',s-14);
+     for i:=1 to (s-32) div 2 do
         write(' ');
      write('Hit 5 to change final score ');writeln('(',diff,')');
-     for i:=1 to (s-24) div 2 do
+     for i:=1 to (s-32) div 2 do
         write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
-     calibrate('Hit esc to Exit',s-8);
-     calibrate('Update 4.4',s-13);
+     calibrate('Hit esc to Exit',s-16);
+     calibrate('Update 4.4.1',s-20);
      writeln;
-     for i:=1 to (s-24) div 2 do
+     for i:=1 to (s-32) div 2 do
         write(' ');
      writeln(username);
-     for i:=1 to (s-24) div 2 do
+     for i:=1 to (s-32) div 2 do
         write(' ');
      write('Score:',fnum);
      writeln;
-     for i:=1 to (s-24) div 2 do
+     for i:=1 to (s-32) div 2 do
         write(' ');
      write('Max number:',fmove);
 end;
@@ -1162,21 +1166,22 @@ begin
         calibrate('User preferences',s);
         for i:=1 to s-1 do write('-');
         writeln;
-        calibrate('Hit 1 to use dark theme',s-11);
-        calibrate('Hit 2 to use light theme',s-10);
-        calibrate('Hit 3 to toggle widescreen mode',s-3);
-        calibrate('Hit 4 to change username',s-10);
-        calibrate('Hit 5 to change keyboard bindings',s-1);
-        if color=-1 then calibrate('Hit 6 to turn on color',s-11)
-        else calibrate('Hit 6 to turn off color',s-10);
-        if efl=1 then calibrate('Hit 7 to turn off enhanced flashlight',s+4)
-        else calibrate('Hit 7 to turn on enhanced flashlight',s+3);
-        if soun=1 then calibrate('Hit 8 to turn off sound',s-11)
-        else calibrate('Hit 8 to turn on sound',s-11);
-        if gfx=1 then calibrate('Hit 9 to turn on low settings',s-4)
-        else calibrate('Hit 9 to turn on high settings',s-4);
+        calibrate('Hit 1 to use dark theme',s-15);
+        calibrate('Hit 2 to use light theme',s-14);
+        calibrate('Hit 3 to change between 40/80 columns',s);
+       {calibrate('Hit 3 to trigger widescreen mode',s-5)};
+        calibrate('Hit 4 to change username',s-14);
+        calibrate('Hit 5 to change keyboard bindings',s-5);
+        if color=-1 then calibrate('Hit 6 to turn on color',s-16)
+        else calibrate('Hit 6 to turn off color',s-14);
+        if efl=1 then calibrate('Hit 7 to turn off enhanced flashlight',s)
+        else calibrate('Hit 7 to turn on enhanced flashlight',s-1);
+        if soun=1 then calibrate('Hit 8 to turn off sound',s-15)
+        else calibrate('Hit 8 to turn on sound',s-15);
+        if gfx=1 then calibrate('Hit 9 to turn on low settings',s-8)
+        else calibrate('Hit 9 to turn on high settings',s-8);
         writeln;
-        calibrate('Hit esc to exit',s-18);
+        calibrate('Hit esc to exit',s-22);
 end;
 procedure menu5;
 var k:byte;
@@ -1212,34 +1217,34 @@ begin
         calibrate('Hit esc to exit',s-13);
 end;
 begin
-     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;s:=80;wide:=false;
+     s:=80;
+     hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
      bg:=15;txt:=0;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
      repeat
            count:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
+           if s=40 then textmode(c40) else textmode(c80);
            textcolor(txt);
            textbackground(bg);
            lowvideo;
            repeat
                 if username='' then username:='Guest';
-                case wide of
-                        true:s:=120;
-                        false:s:=80;
-                end;
                 menu1;
                 repeat
                         ch:=readkey;
                 until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6');
                 if ch='2' then
                 repeat
-                        case wide of
-                                true:s:=120;
-                                false:s:=80;
-                        end;
+                        if s=40 then textmode(c40) else textmode(c80);
+                        {case wide of
+                              true:s:=120;
+                              false:s:=80;
+                        end;}
                         menu4;
                         repeat
                                 ch4:=readkey;
-                        until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='3') or (ch4='7') or (ch4=chr(27)) or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9');
+                        until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
+                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3');
                         if ch4='1' then
                         begin
                                 bg:=0;txt:=15;
@@ -1255,10 +1260,20 @@ begin
                                 textbackground(bg);
                                 writef1;
                         end;
+                        {if ch4='3' then
+                        begin
+                             case s of
+                             80:wide:=true;
+                             120:wide:=false;
+                             end;
+                        end;}
                         if ch4='3' then
-                        case s of
-                                80:wide:=true;
-                                120:wide:=false;
+                        begin
+                           case s of
+                                80:s:=40;
+                                40:s:=80;
+                           end;
+                           writef1;
                         end;
                         if ch4='6' then
                         begin
@@ -1326,7 +1341,8 @@ begin
                                                 right:=readkey;
                                                 if right=#0 then right:=readkey;
                                                 writef1;
-                                        until (right<>left) and (right<>down) and (right<>up) and (right<>chr(27)) and (right<>re);
+                                        until (right<>left) and (right<>down)
+                                        and (right<>up) and (right<>chr(27)) and (right<>re);
                                 end;
                                 if ch5='5' then
                                 begin
@@ -1335,7 +1351,8 @@ begin
                                                 re:=readkey;
                                                 if re=#0 then re:=readkey;
                                                 writef1;
-                                        until (re<>right) and (re<>left) and (re<>down) and (re<>up) and (re<>chr(27));                                end;
+                                        until (re<>right) and (re<>left) and (re<>down) and (re<>up) and (re<>chr(27));
+                                end
                         until ch5=chr(27);
                 until ch4=chr(27);
                 if ch='4' then
@@ -1345,7 +1362,8 @@ begin
                                 modsintro(easy,hidden,hardrock,spunout,nofail,flashlight);
                                 repeat
                                         ch4:=readkey;
-                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s') or (ch4='n') or (ch4='f') or (ch4=chr(27)) or (ch4='1');
+                                until (ch4='h') or (ch4='e') or (ch4='r') or (ch4='s') or (ch4='n')
+                                or (ch4='f') or (ch4=chr(27)) or (ch4='1');
                                 if ch4='h' then hidden:=hidden*(-1);
                                 if ch4='e' then easy:=easy*(-1);
                                 if ch4='r' then hardrock:=hardrock*(-1);
@@ -1476,7 +1494,7 @@ begin
                         if gfx<>1 then title else titlegfx;
                       end;
                       if ch='n' then
-                        if gfx<>1 then title else titlegfx;
+                         if gfx<>1 then title else titlegfx;
                 end;
                 if (lose(a,cs)=true) and (nofail=1) then continue;
            until (win(a,diff,cs)=true) or (lose(a,cs)=true);
@@ -1487,8 +1505,8 @@ begin
                  begin
                       flashlight:=-1;
                       hidden:=-1;
-                      title;
-                      printf;
+                      if gfx<>1 then title else titlegfx;
+                      if gfx<>1 then printf else printfgfx;
                       writeln('YOU WON');
                       if soun=1 then
                       begin
@@ -1524,8 +1542,8 @@ begin
                  begin
                       flashlight:=-1;
                       hidden:=-1;
-                      title;
-                      printf;
+                      if gfx<>1 then title else titlegfx;
+                      if gfx<>1 then printf else printfgfx;
                       writeln('YOU LOST');
                       if soun=1 then
                       begin
