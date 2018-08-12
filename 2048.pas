@@ -1819,6 +1819,7 @@ begin
               end;
            if ch=chr(27) then
            begin
+                NormVideo;
                 clrscr;
                 exit;
            end;
