@@ -1560,7 +1560,9 @@ begin
            if s>=120 then wide:=true else wide:=false;
            textcolor(txt);
            textbackground(bg);
-           lowvideo;
+           {$IFDEF MSDOS}
+               lowvideo;
+           {$ENDIF}
            repeat
                 if username='' then username:='Guest';
                 menu1;
@@ -1585,7 +1587,9 @@ begin
                                 bg:=0;txt:=15;
                                 textcolor(txt);
                                 textbackground(bg);
-                                lowvideo;
+                                {$IFDEF MSDOS}
+                                    lowvideo;
+                                {$ENDIF}
                                 writef1;
                         end;
                         if ch4='2' then
