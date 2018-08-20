@@ -16,11 +16,11 @@
 uses crt;
 type mang=array[0..10,0..10] of longint;
 var a,d,c,e:mang;
-        i,j,diff,diff1,difftotal,code,c1,count,count1:word;
+        i,j,diff,code,c1,count,count1:word;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re,re1,up1,down1,left1,right1:char;
-        fmove,fnum,bg,txt,soun:longint;
+        fmove,fnum:longint;
         moved,moved1,loaded,wide:boolean;
-        hidden,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx:shortint;
+        hidden,bg,txt,soun,diff1,difftotal,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx:shortint;
         cs,s,x,y,x1,y1:byte;
         username:string;
 procedure titlegfx;
@@ -471,7 +471,7 @@ procedure printf;
 var i,j,k,k1:byte;
 begin
      k1:=0;
-     if nofail<>1 then
+     if ((nofail<>1) and (s<80) and (cs<4)) or ((nofail<>1) and (s>=80)) then
      begin
         for i:=1 to sqr(cs+1) do
             if gfx<>1 then write('--') else write(chr(196),chr(196));
@@ -525,44 +525,47 @@ begin
      if hidden=1 then k1:=k1+3;
      if hardrock=1 then k1:=k1+3;
      if flashlight=1 then k1:=k1+3;
-     for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
-         write(' ');
-     if cs>=4 then
+     if s>=80 then
      begin
-        if color<>-1 then textbackground(2);
-        write('EZ');
-        if color<>-1 then textbackground(bg);
-        write(' ');
+          for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
+                write(' ');
+          if cs>=4 then
+          begin
+               if color<>-1 then textbackground(2);
+               write('EZ');
+               if color<>-1 then textbackground(bg);
+               write(' ');
+          end;
+          if nofail=1 then
+          begin
+               if color<>-1 then textbackground(1);
+               write('NF');
+               if color<>-1 then textbackground(bg);
+               write(' ');
+          end;
+          if spunout=1 then
+          begin
+               if color<>-1 then textbackground(3);
+               write('SO');
+               if color<>-1 then textbackground(bg);
+               write(' ');
+          end;
+          if hidden=1 then
+          begin
+               if color<>-1 then textbackground(6);
+               write('HD');
+               if color<>-1 then textbackground(bg);
+               write(' ');
+          end;
+          if hardrock=1 then
+          begin
+               if color<>-1 then textbackground(4);
+               write('HR');
+               if color<>-1 then textbackground(bg);
+               write(' ');
+          end;
+          if flashlight=1 then write('FL');
      end;
-     if nofail=1 then
-     begin
-        if color<>-1 then textbackground(1);
-        write('NF');
-        if color<>-1 then textbackground(bg);
-        write(' ');
-     end;
-     if spunout=1 then
-     begin
-        if color<>-1 then textbackground(3);
-        write('SO');
-        if color<>-1 then textbackground(bg);
-        write(' ');
-     end;
-     if hidden=1 then
-     begin
-        if color<>-1 then textbackground(6);
-        write('HD');
-        if color<>-1 then textbackground(bg);
-        write(' ');
-     end;
-     if hardrock=1 then
-     begin
-        if color<>-1 then textbackground(4);
-        write('HR');
-        if color<>-1 then textbackground(bg);
-        write(' ');
-     end;
-     if flashlight=1 then write('FL');
      writeln;
      for i:=0 to cs do
      begin
@@ -1436,7 +1439,7 @@ begin
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      if s>=80 then calibrate('Hit 7 to start a multiplayer game',s+2);
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.0',s-22);
+     calibrate('Update 5.0.1',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1467,6 +1470,8 @@ begin
      calibrate('Hit 4 for 4096',s-3);
      calibrate('Hit 5 for 8192',s-3);
      calibrate('Hit 6 for 16384',s-2);
+     writeln;
+     calibrate('Hit esc to exit',s-2);
 end;
 procedure menu3;
 var k:byte;
@@ -1789,8 +1794,10 @@ begin
                         menu2;
                         repeat
                                 ch2:=readkey;
-                        until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or (ch2='6');
+                        until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or (ch2='6')
+                        or (ch2=chr(27));
                         val(ch2,c1,code);
+                        if ch2=chr(27) then break;
                         if c1>0 then diff:=pow2(c1+8);
                         if c1=0 then
                                 diff:=1;
@@ -1819,7 +1826,6 @@ begin
               end;
            if ch=chr(27) then
            begin
-                NormVideo;
                 clrscr;
                 exit;
            end;
