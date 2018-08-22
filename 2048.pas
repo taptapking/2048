@@ -16,14 +16,14 @@
 uses crt;
 type mang=array[0..10,0..10] of longint;
 var a,d,c,e:mang;
-        i,j,diff,code,c1,count,count1:word;
+        i,j,code,c1,count,count1,diff:word;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re,re1,up1,down1,left1,right1:char;
         fmove,fnum:longint;
         moved,moved1,loaded,wide:boolean;
-        hidden,bg,txt,soun,diff1,difftotal,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx:shortint;
+        hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun:shortint;
         cs,s,x,y,x1,y1:byte;
-        username:string;
-procedure titlegfx;
+        username,s1:string;
+procedure titlegfx; {renders the top difficulty board in high settings}
 begin
         clrscr;
         for i:=1 to s-1 do
@@ -66,7 +66,7 @@ begin
                 write('* ');
         writeln;
 end;
-procedure title;
+procedure title; {renders the top difficulty board in low settings}
 begin
         clrscr;
         for i:=1 to s-1 do
@@ -109,7 +109,7 @@ begin
                 write('* ');
         writeln;
 end;
-function log2(a:longint):integer;
+function log2(a:longint):integer;   {no need explaination here}
 var c:integer;
 begin
         c:=0;
@@ -120,7 +120,7 @@ begin
         end;
         log2:=c;
 end;
-function pow2(a:byte):longint;
+function pow2(a:byte):longint;      {2^any number}
 var i,c:integer;
 begin
         c:=1;
@@ -128,14 +128,14 @@ begin
         c:=c*2;
         pow2:=c;
 end;
-procedure calibrate(st:string;s:byte);
+procedure calibrate(st:string;s:byte);{print a string to the middle of the screen}
 var k:byte;
 begin
      for k:=1 to (s-length(st)) div 2 do
          write(' ');
      writeln(st);
 end;
-function lnth(a:longint):byte;
+function lnth(a:longint):byte; {determine how many digit does a number have}
 var l:byte;
 begin
      l:=0;
@@ -145,7 +145,7 @@ begin
      until a=a div 10;
      lnth:=l;
 end;
-function multiplier(ez,hd,hr,so,nf,fl:byte):real;
+function multiplier(ez,hd,hr,so,nf,fl:byte):real;{recalculate score after applying mods}
 var m:real;
 begin
      m:=1;
@@ -157,7 +157,7 @@ begin
      if nf=1 then m:=m*0.5;
      multiplier:=m;
 end;
-procedure modsintro(ez1,hd1,hr1,so1,nf1,fl1:byte);
+procedure modsintro(ez1,hd1,hr1,so1,nf1,fl1:byte);{prints mods selection board}
 var i:byte;
 begin
         for i:=1 to s-1 do write('-');writeln;
@@ -209,7 +209,7 @@ begin
                 write(' ');
         write('Hit esc to close');
 end;
-function point(a:mang;cs,hd,hr,so,nf,fl:byte;diff:word):longint;
+function point(a:mang;cs,hd,hr,so,nf,fl:byte;diff:word):longint;{calculate score based on mods and the board}
 var i,j,pt:longint;
 begin
      pt:=0;
@@ -224,7 +224,7 @@ begin
      pt:=pt*(diff+1);
      point:=pt;
 end;
-procedure continue;
+procedure continue;{delete 2 lowest numbers on P1 Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -243,7 +243,7 @@ begin
          for j:=0 to cs do
              if (a[i,j]=b[1]) or (a[i,j]=b[2]) then a[i,j]:=0;
 end;
-procedure continue1;
+procedure continue1;{delete 2 lowest numbers on P2 Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -262,7 +262,7 @@ begin
          for j:=0 to cs do
              if (d[i,j]=b[1]) or (d[i,j]=b[2]) then d[i,j]:=0;
 end;
-function checkfile(fl:string):boolean;
+function checkfile(fl:string):boolean;{verify if a file is avaliable}
 var f:text;
     chk:boolean;
 begin
@@ -275,35 +275,35 @@ begin
      if chk=true then close(f);
      checkfile:=chk;
 end;
-procedure rewind;
+procedure rewind;{rewind a move on P1 Board}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              a[i,j]:=c[i,j];
 end;
-procedure rewind1;
+procedure rewind1;{rewind a move on P2 Board}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              d[i,j]:=e[i,j];
 end;
-procedure backup;
+procedure backup;{backup the recent move from P1 board to rewind later}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              c[i,j]:=a[i,j];
 end;
-procedure backup1;
+procedure backup1;{backup the recent move from P2 board to rewind later}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              e[i,j]:=d[i,j];
 end;
-function difference(a,b:mang;cs:byte):boolean;
+function difference(a,b:mang;cs:byte):boolean;{check the difference between 2 boards}
 var i,j:byte;
     chk:boolean;
 begin
@@ -313,7 +313,7 @@ begin
              if a[i,j]<>b[i,j] then chk:=true;
      difference:=chk;
 end;
-function win(a:mang;n:word;cs:byte):boolean;
+function win(a:mang;n:word;cs:byte):boolean;{determine if the player has won or not}
 var i,j:byte;
 begin
      win:=false;
@@ -321,7 +321,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=n then win:=true;
 end;
-function lose(a:mang;cs:byte):boolean;
+function lose(a:mang;cs:byte):boolean;{determine if the player has lost or not}
 var i,j:byte;
 begin
      lose:=true;
@@ -335,7 +335,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start;
+procedure start;{spawn random numbers on P1 board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -356,7 +356,7 @@ begin
           until (a[i,j]=2) or (a[i,j]=4);
      end;
 end;
-procedure start1;
+procedure start1;{spawn random numbers on P2 board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -377,7 +377,7 @@ begin
           until (d[i,j]=2) or (d[i,j]=4);
      end;
 end;
-procedure spawn;
+procedure spawn;{spawn random number on P1 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -397,7 +397,7 @@ begin
           until a[i,j] mod 2=0;
      end;
 end;
-procedure spawn1;
+procedure spawn1;{spawn random number on P2 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -417,7 +417,7 @@ begin
           until d[i,j] mod 2=0;
      end;
 end;
-procedure spawnhardrock;
+procedure spawnhardrock;{spawn larger random number on P1 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -437,7 +437,7 @@ begin
           until (a[i,j] mod 2=0) and (a[i,j]<>6);
      end;
 end;
-procedure spawnhardrock1;
+procedure spawnhardrock1;{spawn larger random number on P2 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -457,7 +457,7 @@ begin
           until (d[i,j] mod 2=0) and (d[i,j]<>6);
      end;
 end;
-function health(a:mang;cs:byte):byte;
+function health(a:mang;cs:byte):byte;{generates health bar value}
 var i,j,count:byte;
 begin
      count:=1;
@@ -467,7 +467,7 @@ begin
      if count>sqr(cs+1) then count:=sqr(cs+1);
      health:=count;
 end;
-procedure printf;
+procedure printf;{prints a board and health bar in singleplayer mode}
 var i,j,k,k1:byte;
 begin
      k1:=0;
@@ -507,18 +507,19 @@ begin
             if gfx<>1 then write('__') else write(chr(196),chr(196));
         if gfx<>1 then write('_/') else write(chr(196),chr(196),chr(217));
         writeln;
-     end
+     end {renders health bar when not using NF}
      else
      begin
           for k:=1 to s-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) do
               write(' ');
           writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
-     end;
+     end; {prints score to the screen}
      for k:=2 to (s-6*(cs+1)) div 2 do
          write(' ');
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
+     {prints the top of the board}
      if cs>=4 then k1:=k1+3;
      if nofail=1 then k1:=k1+3;
      if spunout=1 then k1:=k1+3;
@@ -528,7 +529,7 @@ begin
      if s>=80 then
      begin
           for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
-                write(' ');
+               write(' ');
           if cs>=4 then
           begin
                if color<>-1 then textbackground(2);
@@ -565,7 +566,7 @@ begin
                write(' ');
           end;
           if flashlight=1 then write('FL');
-     end;
+     end; {prints mods that the player is using}
      writeln;
      for i:=0 to cs do
      begin
@@ -575,15 +576,16 @@ begin
           for j:=0 to cs do
           begin
                    if (a[i,j]<>0) and (flashlight<>1) then
+                   {print numbers when flashlight mod is disabled and the number inside is not 0}
                    begin
                         if color<>-1 then
                         begin
                                 textbackground(round(log2(a[i,j])));
                                 if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
                                 then textbackground(round(log2(a[i,j])-1));
-                        end;
+                        end;{generate colors when color is enabled}
                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                        if (a[i,j]>16) and (hidden=1) then
+                        if (a[i,j]>16) and (hidden=1) then {prints numbers when hidden mod is enabled}
                         begin
                                 textbackground(bg);
                                 write('  ','?','  ');
@@ -602,10 +604,11 @@ begin
                         if gfx<>1 then write('|') else write(chr(179));
                    end;
                    if (a[i,j]=0) and (flashlight<>1) then
-                   if gfx<>1 then write('     |')
+                   {print numbers when flashlight mod is disabled and the number inside is 0}
+                          if gfx<>1 then write('     |')
                    else write('     ',chr(179));
-                    if (flashlight=1) and (efl=1) then
-                    begin
+                   if (flashlight=1) and (efl=1) then
+                   begin{print numbers when flashlight mod and enhanced mode are enabled}
                         if (x-1<=i) and (i<=x+1) and (y-1<=j) and (j<=y+1) then
                         begin
                                 if a[i,j]=0 then
@@ -617,9 +620,9 @@ begin
                                                 textbackground(round(log2(a[i,j])));
                                                 if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
                                                 then textbackground(round(log2(a[i,j])-1));
-                                        end;
+                                        end;{generate colors when color is enabled}
                                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                                        if (a[i,j]>16) and (hidden=1) then
+                                        if (a[i,j]>16) and (hidden=1) then{print numbers when hidden mod is enabled}
                                         begin
                                                 textbackground(bg);
                                                 write('  ','?','  ');
@@ -636,7 +639,7 @@ begin
                                                 write(a[i,j]);
                                         textbackground(bg);
                                         if gfx<>1 then write('|') else write(chr(179));
-                                end;
+                                end;{prints numbers in the visible area}
                         end
                         else
                         begin
@@ -644,10 +647,10 @@ begin
                                 write('     ');
                                 textbackground(bg);
                                 if gfx<>1 then write('|') else write(chr(179));
-                        end;
+                        end;   {hides numbers not in the visible area}
                     end;
                     if (flashlight=1) and (efl=-1) then
-                    begin
+                    begin {print numbers when flashlight mod is enabled and enhanced mode is disabled}
                         if ((health(a,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a,cs)<=2) and (i>=2) and (j<=cs-2)) then
                         begin
                              if a[i,j]=0 then
@@ -659,13 +662,13 @@ begin
                                         textbackground(round(log2(a[i,j])));
                                         if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
                                         then textbackground(round(log2(a[i,j])-1));
-                                  end;
+                                  end;{generate colors when color is enabled}
                                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
                                   if (a[i,j]>16) and (hidden=1) then
                                   begin
                                         textbackground(bg);
                                         write('  ','?','  ');
-                                  end;
+                                  end;{print numbers when hidden is enabled}
                                   if a[i,j]<10 then
                                      write('  ',a[i,j],'  ');
                                   if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
@@ -678,7 +681,7 @@ begin
                                      write(a[i,j]);
                                   textbackground(bg);
                                   if gfx<>1 then write('|') else write(chr(179));
-                             end;
+                             end; {prints numbers in the visible area}
                         end
                         else
                         begin
@@ -686,7 +689,7 @@ begin
                                 write('     ');
                                 textbackground(bg);
                                 if gfx<>1 then write('|') else write(chr(179));
-                        end;
+                        end; {hides numbers not in the visible area}
                     end;
                     textbackground(bg);
           end;
@@ -701,9 +704,9 @@ begin
                if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
           end;
      end;
-     writeln('Moves:',count);
+     writeln('Moves:',count);{prints borders between lines}
 end;
-procedure printfmulti;
+procedure printfmulti; {prints health bar and board in multiplayer mode}
 var i,j,k,k1:byte;
 begin
      k1:=0;
@@ -1052,7 +1055,7 @@ begin
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
-procedure move(c:char);
+procedure move(c:char); {moves all number to a side of P1 board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1107,7 +1110,7 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure move1(c:char);
+procedure move1(c:char);  {moves all numbers to a side of P2 board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1162,7 +1165,7 @@ begin
             for j:=0 to cs do
                 d[i,j]:=b[i,j];
 end;
-procedure clear(c:char);
+procedure clear(c:char);  {combines 2 numbers when they collide on P1 Board}
 var i,j,k:byte;
 begin
      if c=up then
@@ -1199,7 +1202,7 @@ begin
                 end;
      move(c);
 end;
-procedure clear1(c:char);
+procedure clear1(c:char);{combines 2 numbers when they collide on P2 board}
 var i,j,k:byte;
 begin
      if c=up1 then
@@ -1236,7 +1239,7 @@ begin
                 end;
      move1(c);
 end;
-procedure readf;
+procedure readf;    {reads configurations from a file}
 var f:text;
 begin
      assign(f,'record.txt');
@@ -1278,7 +1281,7 @@ begin
      if gfx=0 then gfx:=-1;
      if s=0 then s:=80;
 end;
-procedure writef1;
+procedure writef1;    {writes configuration to a file}
 var f:text;
 begin
      assign(f,'record.txt');
@@ -1304,7 +1307,7 @@ begin
      writeln(f,re1);
      close(f);
 end;
-function maxnum(a:mang;cs:byte):longint;
+function maxnum(a:mang;cs:byte):longint; {determines what number is the largest on the board}
 var i,j,m:longint;
 begin
      m:=a[0,0];
@@ -1313,7 +1316,7 @@ begin
              if a[i,j]>m then m:=a[i,j];
      maxnum:=m;
 end;
-procedure writef;
+procedure writef; {writes configuration to a file}
 var f:text;
 begin
      assign(f,'record.txt');
@@ -1339,7 +1342,7 @@ begin
      writeln(f,re1);
      close(f);
 end;
-procedure save;
+procedure save;  {saves game to a file}
 var i,j:byte;
     f:text;
     c:char;
@@ -1377,7 +1380,7 @@ begin
           close(f);
      end;
 end;
-procedure load;
+procedure load; {loads game from a file}
 var f:text;
     i,j:byte;
 begin
@@ -1406,7 +1409,7 @@ begin
         if efl=0 then efl:=-1;
         close(f);
 end;
-procedure cleargame;
+procedure cleargame;   {deletes save file}
 var f:text;
 begin
      assign(f,'save.txt');
@@ -1419,17 +1422,16 @@ begin
      for k:=1 to s-1 do
          write('-');
      writeln;
-     calibrate('2048 Advanced',s);
+     calibrate('2048 Remastered',s);
      for k:=1 to s-1 do
          write('-');
      writeln;
      calibrate('Hit 1 to start a single player game',s+4);
      calibrate('Hit 2 to access user preferences',s);
      if checkfile('save.txt')=true then
-     begin
-          calibrate('Hit 3 to load your game',s-9);
-          calibrate('Hit d to clear your game',s-8);
-     end;
+          calibrate('Hit 3 to load your game',s-9)
+     else
+         writeln;
      calibrate('Hit 4 to use mods',s-14);
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1438,8 +1440,12 @@ begin
         write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      if s>=80 then calibrate('Hit 7 to start a multiplayer game',s+2);
+     if checkfile('save.txt')=true then
+        calibrate('Hit d to clear your game',s-8)
+     else
+         writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.0.1',s-20);
+     calibrate('Update 5.1',s-22);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1451,6 +1457,7 @@ begin
      for i:=1 to (s-32) div 2 do
         write(' ');
      write('Max number:',fmove);
+     gotoxy((s-32) div 2-2,x);write('->');
 end;
 procedure menu2;
 var k:byte;
@@ -1514,6 +1521,11 @@ begin
         else calibrate('Hit 9 to turn on high settings',s-8);
         writeln;
         calibrate('Hit esc to exit',s-22);
+        if y<13 then
+           gotoxy((s-34) div 2-2,y)
+        else
+            gotoxy((s-34) div 2-2,y+1);
+        write('>');
 end;
 procedure menu5;
 var k:byte;
@@ -1552,12 +1564,21 @@ begin
         writeln('rewind1: ',re,'       rewind2: ',re1);
         writeln;
         calibrate('Hit esc to exit',s-13);
+        if x1<14 then
+        begin
+             gotoxy((s-34) div 2-2,x1);write('>');
+        end
+        else
+        begin
+             gotoxy((s-28) div 2,21);write('>');
+        end;
+        gotoxy(1,22);
 end;
 begin
      s:=80;
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
-     bg:=15;txt:=0;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
+     bg:=0;txt:=15;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
      up1:='w';down1:='s';left1:='a';right1:='d';re1:='z';
      repeat
            count:=0;count1:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
@@ -1566,16 +1587,25 @@ begin
            textcolor(txt);
            textbackground(bg);
            lowvideo;
+           x:=4;y:=4;x1:=4;
            repeat
                 if username='' then username:='Guest';
                 menu1;
                 repeat
                         ch:=readkey;
                 until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6')
-                or ((ch='7') and (s>=80));
+                or ((ch='7') and (s>=80)) or ((ch=#72) and (x>4)) or ((ch=#80) and (x<12)) or (ch=#13);
+                if (ch=#72) then x:=x-1;
+                if (ch=#80) then x:=x+1;
+                if (ch=#13) then
+                begin
+                     str(x-3,s1);
+                     ch:=s1[1];
+                     if ch='8' then ch:='d';
+                     if ch='9' then ch:=#27;
+                end;
                 if ch='2' then
                 repeat
-                        {if s=40 then textmode(c40) else textmode(c80);}
                         case wide of
                               true:s:=120;
                               false:s:=80;
@@ -1584,7 +1614,16 @@ begin
                         repeat
                                 ch4:=readkey;
                         until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
-                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3');
+                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3')
+                        or ((ch4=#72) and (y>4)) or ((ch4=#80) and (y<13)) or (ch4=#13);
+                        if ch4=#72 then y:=y-1;
+                        if ch4=#80 then y:=y+1;
+                        if ch4=#13 then
+                        begin
+                             str(y-3,s1);
+                             ch4:=s1[1];
+                             if s1='10' then ch4:=#27;
+                        end;
                         if ch4='1' then
                         begin
                                 bg:=0;txt:=15;
@@ -1617,8 +1656,14 @@ begin
                         {if ch4='3' then
                         begin
                            case s of
-                                80:s:=40;
-                                40:s:=80;
+                                80:begin
+                                        s:=40;
+                                        textmode(c40);
+                                   end;
+                                40:begin
+                                        s:=80;
+                                        textmode(c80);
+                                   end;
                            end;
                            writef1;
                         end;}
@@ -1654,7 +1699,17 @@ begin
                                 repeat
                                         ch5:=readkey;
                                 until (ch5='1') or (ch5='2') or (ch5='3') or (ch5='4') or (ch5='5') or (ch5=chr(27))
-                                or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0');
+                                or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0')
+                                or ((ch5=#72) and (x1>4)) or ((ch5=#80) and (x1<14)) or (ch5=#13);
+                                if ch5=#72 then x1:=x1-1;
+                                if ch5=#80 then x1:=x1+1;
+                                if ch5=#13 then
+                                begin
+                                     str(x1-3,s1);
+                                     ch5:=s1[1];
+                                     if s1='10' then ch5:='0';
+                                     if s1='11' then ch5:=#27;
+                                end;
                                 if ch5='1' then
                                 begin
                                         writeln('input new key for up1');
