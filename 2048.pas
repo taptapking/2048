@@ -1439,13 +1439,13 @@ begin
      for i:=1 to (s-32) div 2 do
         write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
-     if s>=80 then calibrate('Hit 7 to start a multiplayer game',s+2);
+     if s>=80 then calibrate('Hit 7 to start a multiplayer game',s+2) else writeln;
      if checkfile('save.txt')=true then
         calibrate('Hit d to clear your game',s-8)
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.1',s-22);
+     calibrate('Update 5.2',s-22);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1458,6 +1458,36 @@ begin
         write(' ');
      write('Max number:',fmove);
      gotoxy((s-32) div 2-2,x);write('->');
+     if (s>=80) and (gfx<>-1) then
+        begin
+           gotoxy((s-34) div 2-2,1);
+           write(chr(201));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(187));
+           for i:=1 to 16 do
+           begin
+                gotoxy((s-34) div 2-2,i+1);
+                write(chr(186));
+                gotoxy((s-34) div 2+37,i+1);
+                write(chr(186));
+           end;
+           gotoxy((s-34) div 2-2,3);
+           write(chr(204));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(185));
+           gotoxy((s-34) div 2-2,18);
+           write(chr(200));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(188));
+           gotoxy((s-34) div 2-2,14);
+           write(chr(204));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(185));
+        end;
 end;
 procedure menu2;
 var k:byte;
@@ -1505,13 +1535,13 @@ begin
         calibrate('User preferences',s);
         for i:=1 to s-1 do write('-');
         writeln;
-        calibrate('Hit 1 to use dark theme',s-15);
-        calibrate('Hit 2 to use light theme',s-14);
+        calibrate('Hit 1 to use dark theme',s-14);
+        calibrate('Hit 2 to use light theme',s-13);
         {calibrate('Hit 3 to change between 40/80 columns',s);}
         calibrate('Hit 3 to trigger widescreen mode',s-5);
-        calibrate('Hit 4 to change username',s-14);
-        calibrate('Hit 5 to change keyboard bindings',s-5);
-        if color=-1 then calibrate('Hit 6 to turn on color',s-16)
+        calibrate('Hit 4 to change username',s-13);
+        calibrate('Hit 5 to change keyboard bindings',s-4);
+        if color=-1 then calibrate('Hit 6 to turn on color',s-15)
         else calibrate('Hit 6 to turn off color',s-14);
         if efl=1 then calibrate('Hit 7 to turn off enhanced flashlight',s)
         else calibrate('Hit 7 to turn on enhanced flashlight',s-1);
@@ -1526,6 +1556,32 @@ begin
         else
             gotoxy((s-34) div 2-2,y+1);
         write('>');
+        if (s>=80) and (gfx<>-1) then
+        begin
+           gotoxy((s-34) div 2-3,1);
+           write(chr(201));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(187));
+           for i:=1 to 13 do
+           begin
+                gotoxy((s-34) div 2-3,i+1);
+                write(chr(186));
+                gotoxy((s-34) div 2+36,i+1);
+                write(chr(186));
+           end;
+           gotoxy((s-34) div 2-3,3);
+           write(chr(204));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(185));
+           gotoxy((s-34) div 2-3,15);
+           write(chr(200));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(188));
+        end;
+        gotoxy(1,16);
 end;
 procedure menu5;
 var k:byte;
@@ -1572,7 +1628,32 @@ begin
         begin
              gotoxy((s-28) div 2,21);write('>');
         end;
-        gotoxy(1,22);
+        if (s>=80) and (gfx<>-1) then
+        begin
+           gotoxy((s-34) div 2-3,1);
+           write(chr(201));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(187));
+           for i:=1 to 20 do
+           begin
+                gotoxy((s-34) div 2-3,i+1);
+                write(chr(186));
+                gotoxy((s-34) div 2+36,i+1);
+                write(chr(186));
+           end;
+           gotoxy((s-34) div 2-3,3);
+           write(chr(204));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(185));
+           gotoxy((s-34) div 2-3,22);
+           write(chr(200));
+           for i:=1 to 38 do
+               write(chr(205));
+           write(chr(188));
+        end;
+        gotoxy(1,23);
 end;
 begin
      s:=80;
@@ -1589,7 +1670,7 @@ begin
            lowvideo;
            x:=4;y:=4;x1:=4;
            repeat
-                if username='' then username:='Guest';
+                if (username='') or (length(username)>16) then username:='Guest';
                 menu1;
                 repeat
                         ch:=readkey;
@@ -1600,7 +1681,8 @@ begin
                 if (ch=#13) then
                 begin
                      str(x-3,s1);
-                     ch:=s1[1];
+                     if not ((x-3=7) and (s<80)) then
+                        ch:=s1[1];
                      if ch='8' then ch:='d';
                      if ch='9' then ch:=#27;
                 end;
@@ -1689,7 +1771,31 @@ begin
                         end;
                         if ch4='4' then
                         begin
-                                writeln('Type your new username');
+                                if (s>=80) and (gfx<>-1) then
+                                begin
+                                     gotoxy((s-34) div 2-3,6);
+                                     write(chr(201));
+                                     for i:=1 to 38 do
+                                         write(chr(205));
+                                     write(chr(187));
+                                     gotoxy((s-34) div 2-3,8);
+                                     write(chr(204));
+                                     for i:=1 to 38 do
+                                         write(chr(205));
+                                     write(chr(185));
+                                     gotoxy((s-34) div 2-3,10);
+                                     write(chr(200));
+                                     for i:=1 to 38 do
+                                         write(chr(205));
+                                     write(chr(188));
+                                     gotoxy((s-34) div 2-2,7);
+                                     writeln('        Type your new username  ');
+                                     gotoxy((s-34) div 2-2,9);
+                                     write('                        ');
+                                     gotoxy((s-34) div 2-2,9);
+                                end
+                                else
+                                    writeln('Type your new username  ');
                                 readln(username);
                                 writef1;
                         end;
@@ -1709,6 +1815,23 @@ begin
                                      ch5:=s1[1];
                                      if s1='10' then ch5:='0';
                                      if s1='11' then ch5:=#27;
+                                end;
+                                if (s>=80) and (gfx<>-1) then
+                                begin
+                                     gotoxy((s-34) div 2-3,6);
+                                     write(chr(201));
+                                     for i:=1 to 38 do
+                                         write(chr(205));
+                                     write(chr(187));
+                                     gotoxy((s-34) div 2-3,8);
+                                     write(chr(200));
+                                     for i:=1 to 38 do
+                                         write(chr(205));
+                                     write(chr(188));
+                                     gotoxy((s-34) div 2-2,7);
+                                     for i:=1 to 37 do
+                                     write(' ');
+                                     gotoxy((s-34) div 2-2,7);
                                 end;
                                 if ch5='1' then
                                 begin
