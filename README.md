@@ -6,7 +6,7 @@ Source code and compiled binaries for Windows of this game are available for dow
 We recommend you to set your PC's locale to Japan to have better text
 
 ## Build from source
-You do `make`. Works only for Windows and GNU/Linux (both x32 and x64 architectures).
+You do `make`. Works only for Windows (both x32 and x64 architectures).
 
 ## License
 ![GPL v3 logo](https://www.gnu.org/graphics/gplv3-127x51.png)
