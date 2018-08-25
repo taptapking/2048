@@ -20,7 +20,17 @@ Features
 - Single player / 2 players :two_men_holding_hands:
 - ...and more!
 
-For detailed instructions, see [the game's wiki](../../wiki/).
+For detailed instructions, see [the game's wiki](http://github.com/taptapking/2048/wiki).
+
+How to get 2048DOS
+------------------
+
+You can download compiled binaries [here](http://github.com/taptapking/2048/releases).
+
+If you want to build from source:
+1. Clone this repository
+2. `cd` into it
+3. Run `make` or `fpc 2048.pas` (either way, Free Pascal Compiler is required)
 
 License
 -------
