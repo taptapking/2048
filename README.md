@@ -9,7 +9,7 @@ Description
 -----------
 This is 2048 game intended for DOS, with high customizability. There are 5 different difficulties (easy, normal, hard, very hard, master). Different difficulties means different number of blocks spawned after every move. There are also mods, which can affect the score. You can save your game, play with another friend (2 players), change theme, and more!
 
-Although the game is intended for DOS, it might also work 
+Although the game is intended for DOS, it might also work on modern operating systems.
 
 Features
 --------
