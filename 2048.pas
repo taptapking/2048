@@ -500,8 +500,7 @@ begin
         if lose(a,cs)=false then
            if gfx<>1 then write('|') else write(chr(179))
            else if gfx<>1 then write('  |') else write('  ',chr(179));
-        for k:=1 to s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1))-sqr(cs+1)*2-2 do
-              write(' ');
+        gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) ,6);
         writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
         for i:=1 to sqr(cs+1)-1 do
             if gfx<>1 then write('__') else write(chr(196),chr(196));
@@ -510,12 +509,10 @@ begin
      end {renders health bar when not using NF}
      else
      begin
-          for k:=1 to s-1-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) do
-              write(' ');
+          gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)),5);
           writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
      end; {prints score to the screen}
-     for k:=2 to (s-6*(cs+1)) div 2 do
-         write(' ');
+     gotoxy((s-6*(cs+1)) div 2,7-nofail);
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
@@ -528,8 +525,7 @@ begin
      if flashlight=1 then k1:=k1+3;
      if s>=80 then
      begin
-          for k:=1 to (s-6*(cs+1)) div 2-(k1+1) do
-               write(' ');
+          gotoxy(s-k1,7-nofail);
           if cs>=4 then
           begin
                if color<>-1 then textbackground(2);
@@ -570,8 +566,7 @@ begin
      writeln;
      for i:=0 to cs do
      begin
-          for k:=2 to (s-6*(cs+1)) div 2 do
-              write(' ');
+          gotoxy((s-6*(cs+1)) div 2,7-nofail+i*2+1);
           if gfx<>1 then write('|') else write(chr(179));
           for j:=0 to cs do
           begin
@@ -696,8 +691,7 @@ begin
           writeln;
           if i<=cs then
           begin
-               for k:=2 to (s-6*(cs+1)) div 2 do
-                   write(' ');
+               gotoxy((s-6*(cs+1)) div 2,7-nofail+i*2+2);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
@@ -1445,7 +1439,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.2',s-22);
+     calibrate('Update 5.2.1',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1664,7 +1658,8 @@ begin
      repeat
            count:=0;count1:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
            {if s=40 then textmode(c40) else textmode(c80);}
-           if s>=120 then wide:=true else wide:=false;
+           if s>=120 then wide:=true
+           else wide:=false;
            textcolor(txt);
            textbackground(bg);
            lowvideo;
