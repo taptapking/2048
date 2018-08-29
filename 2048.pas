@@ -128,10 +128,10 @@ begin
         c:=c*2;
         pow2:=c;
 end;
-procedure calibrate(st:string;s:byte);{print a string to the middle of the screen}
+procedure calibrate(st:string;s3:byte);{print a string to the middle of the screen}
 var k:byte;
 begin
-     for k:=1 to (s-length(st)) div 2 do
+     for k:=1 to (s3-length(st)) div 2 do
          write(' ');
      writeln(st);
 end;
@@ -1439,7 +1439,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.2.1',s-20);
+     calibrate('Update 5.2.2',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1451,7 +1451,6 @@ begin
      for i:=1 to (s-32) div 2 do
         write(' ');
      write('Max number:',fmove);
-     gotoxy((s-32) div 2-2,x);write('->');
      if (s>=80) and (gfx<>-1) then
         begin
            gotoxy((s-34) div 2-2,1);
@@ -1545,11 +1544,6 @@ begin
         else calibrate('Hit 9 to turn on high settings',s-8);
         writeln;
         calibrate('Hit esc to exit',s-22);
-        if y<13 then
-           gotoxy((s-34) div 2-2,y)
-        else
-            gotoxy((s-34) div 2-2,y+1);
-        write('>');
         if (s>=80) and (gfx<>-1) then
         begin
            gotoxy((s-34) div 2-3,1);
@@ -1575,7 +1569,6 @@ begin
                write(chr(205));
            write(chr(188));
         end;
-        gotoxy(1,16);
 end;
 procedure menu5;
 var k:byte;
@@ -1614,14 +1607,6 @@ begin
         writeln('rewind1: ',re,'       rewind2: ',re1);
         writeln;
         calibrate('Hit esc to exit',s-13);
-        if x1<14 then
-        begin
-             gotoxy((s-34) div 2-2,x1);write('>');
-        end
-        else
-        begin
-             gotoxy((s-28) div 2,21);write('>');
-        end;
         if (s>=80) and (gfx<>-1) then
         begin
            gotoxy((s-34) div 2-3,1);
@@ -1647,7 +1632,6 @@ begin
                write(chr(205));
            write(chr(188));
         end;
-        gotoxy(1,23);
 end;
 begin
      s:=80;
@@ -1658,8 +1642,7 @@ begin
      repeat
            count:=0;count1:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
            {if s=40 then textmode(c40) else textmode(c80);}
-           if s>=120 then wide:=true
-           else wide:=false;
+           if s>=120 then wide:=true else wide:=false;
            textcolor(txt);
            textbackground(bg);
            lowvideo;
@@ -1668,11 +1651,23 @@ begin
                 if (username='') or (length(username)>16) then username:='Guest';
                 menu1;
                 repeat
-                        ch:=readkey;
+                      gotoxy((s-32) div 2-2,x);write('->');
+                      repeat
+                            ch:=readkey;
+                      until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6')
+                      or ((ch='7') and (s>=80)) or ((ch=#72) and (x>4)) or ((ch=#80) and (x<12)) or (ch=#13);
+                if (ch=#72) then
+                begin
+                     gotoxy((s-32) div 2-2,x);write('  ');
+                     x:=x-1;
+                end;
+                if (ch=#80) then
+                begin
+                     gotoxy((s-32) div 2-2,x);write('  ');
+                     x:=x+1;
+                end;
                 until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6')
-                or ((ch='7') and (s>=80)) or ((ch=#72) and (x>4)) or ((ch=#80) and (x<12)) or (ch=#13);
-                if (ch=#72) then x:=x-1;
-                if (ch=#80) then x:=x+1;
+                or ((ch='7') and (s>=80)) or (ch=#13);
                 if (ch=#13) then
                 begin
                      str(x-3,s1);
@@ -1689,12 +1684,38 @@ begin
                         end;
                         menu4;
                         repeat
-                                ch4:=readkey;
+                              if y<13 then
+                                 gotoxy((s-34) div 2-2,y)
+                              else
+                                  gotoxy((s-34) div 2-2,y+1);
+                              write('>');
+                              if (gfx=-1) or (s<80) then
+                                 gotoxy(1,16);
+                              repeat
+                                    ch4:=readkey;
+                              until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
+                              or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3')
+                              or ((ch4=#72) and (y>4)) or ((ch4=#80) and (y<13)) or (ch4=#13);
+                        if ch4=#72 then
+                        begin
+                             if y<13 then
+                                 gotoxy((s-34) div 2-2,y)
+                             else
+                                 gotoxy((s-34) div 2-2,y+1);
+                             write(' ');
+                             y:=y-1;
+                        end;
+                        if ch4=#80 then
+                        begin
+                             if y<13 then
+                                gotoxy((s-34) div 2-2,y)
+                             else
+                                 gotoxy((s-34) div 2-2,y+1);
+                             write(' ');
+                             y:=y+1;
+                        end;
                         until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
-                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3')
-                        or ((ch4=#72) and (y>4)) or ((ch4=#80) and (y<13)) or (ch4=#13);
-                        if ch4=#72 then y:=y-1;
-                        if ch4=#80 then y:=y+1;
+                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3') or (ch4=#13);
                         if ch4=#13 then
                         begin
                              str(y-3,s1);
@@ -1784,13 +1805,13 @@ begin
                                          write(chr(205));
                                      write(chr(188));
                                      gotoxy((s-34) div 2-2,7);
-                                     writeln('        Type your new username  ');
+                                     writeln('        Type your new username');
                                      gotoxy((s-34) div 2-2,9);
                                      write('                        ');
                                      gotoxy((s-34) div 2-2,9);
                                 end
                                 else
-                                    writeln('Type your new username  ');
+                                    writeln('Type your new username');
                                 readln(username);
                                 writef1;
                         end;
@@ -1798,12 +1819,39 @@ begin
                         repeat
                                 menu5;
                                 repeat
-                                        ch5:=readkey;
+                                      if x1<14 then
+                                         gotoxy((s-34) div 2-2,x1)
+                                      else
+                                          gotoxy((s-28) div 2,21);
+                                      write('>');
+                                      if (gfx=-1) or (s<80) then
+                                         gotoxy(1,23);
+                                      repeat
+                                            ch5:=readkey;
+                                      until (ch5='1') or (ch5='2') or (ch5='3') or (ch5='4') or (ch5='5') or (ch5=chr(27))
+                                      or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0')
+                                      or ((ch5=#72) and (x1>4)) or ((ch5=#80) and (x1<14)) or (ch5=#13);
+                                      if ch5=#72 then
+                                      begin
+                                           if x1<14 then
+                                              gotoxy((s-34) div 2-2,x1)
+                                           else
+                                               gotoxy((s-28) div 2,21);
+                                           write(' ');
+                                           x1:=x1-1;
+                                      end;
+                                      if ch5=#80 then
+                                      begin
+                                           if x1<14 then
+                                              gotoxy((s-34) div 2-2,x1)
+                                           else
+                                               gotoxy((s-28) div 2,21);
+                                           write(' ');
+                                           x1:=x1+1;
+                                      end;
                                 until (ch5='1') or (ch5='2') or (ch5='3') or (ch5='4') or (ch5='5') or (ch5=chr(27))
                                 or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0')
-                                or ((ch5=#72) and (x1>4)) or ((ch5=#80) and (x1<14)) or (ch5=#13);
-                                if ch5=#72 then x1:=x1-1;
-                                if ch5=#80 then x1:=x1+1;
+                                or (ch5=#13);
                                 if ch5=#13 then
                                 begin
                                      str(x1-3,s1);
