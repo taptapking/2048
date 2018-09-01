@@ -20,9 +20,55 @@ var a,d,c,e:mang;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re,re1,up1,down1,left1,right1:char;
         fmove,fnum:longint;
         moved,moved1,loaded,wide:boolean;
-        hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun:shortint;
+        hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun,nofail1:shortint;
         cs,s,x,y,x1,y1:byte;
         username,s1:string;
+procedure losingtune;
+begin
+     delay(150);
+     sound(262);
+     delay(250);
+     sound(147);
+     delay(250);
+     sound(262);
+     delay(200);
+     sound(196);
+     delay(200);
+     nosound;
+     delay(500);
+     sound(131);
+     delay(520);
+     nosound;
+end;
+procedure winningtune;
+begin
+     delay(150);
+     Sound(650);
+     Delay(600);
+     NoSound;
+
+     Delay(180);
+     Sound(500);
+     Delay(150);
+
+     Sound(570);
+     Delay(150);
+
+     Sound(640);
+     Delay(150);
+
+     Sound(570);
+     Delay(150);
+     NoSound;
+
+     Delay(200);
+     Sound(770);
+     Delay(150);
+     nosound;
+     Sound(770);
+     Delay(200);
+     NoSound;
+end;
 procedure titlegfx; {renders the top difficulty board in high settings}
 begin
         clrscr;
@@ -512,7 +558,8 @@ begin
           gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)),5);
           writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
      end; {prints score to the screen}
-     gotoxy((s-6*(cs+1)) div 2,7-nofail);
+     if (nofail=1) or ((s<80) and (cs>3)) then nofail1:=1 else nofail1:=-1;
+     gotoxy((s-6*(cs+1)) div 2,7-nofail1);
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
@@ -525,7 +572,7 @@ begin
      if flashlight=1 then k1:=k1+3;
      if s>=80 then
      begin
-          gotoxy(s-k1,7-nofail);
+          gotoxy(s-k1,7-nofail1);
           if cs>=4 then
           begin
                if color<>-1 then textbackground(2);
@@ -566,7 +613,7 @@ begin
      writeln;
      for i:=0 to cs do
      begin
-          gotoxy((s-6*(cs+1)) div 2,7-nofail+i*2+1);
+          gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+1);
           if gfx<>1 then write('|') else write(chr(179));
           for j:=0 to cs do
           begin
@@ -691,7 +738,7 @@ begin
           writeln;
           if i<=cs then
           begin
-               gotoxy((s-6*(cs+1)) div 2,7-nofail+i*2+2);
+               gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+2);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
@@ -704,7 +751,7 @@ procedure printfmulti; {prints health bar and board in multiplayer mode}
 var i,j,k,k1:byte;
 begin
      k1:=0;
-     if nofail<>1 then
+     if ((nofail<>1) and (s<120) and (cs<4)) or ((nofail<>1) and (s>=120)) then
      begin
         for i:=1 to sqr(cs+1) do
             if gfx<>1 then write('--') else write(chr(196),chr(196));
@@ -1439,7 +1486,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.2.2',s-20);
+     calibrate('Update 5.2.3',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1502,6 +1549,31 @@ begin
      calibrate('Hit 6 for 16384',s-2);
      writeln;
      calibrate('Hit esc to exit',s-2);
+     if (gfx<>-1) then
+        begin
+           gotoxy((s-20) div 2-2,1);
+           write(chr(201));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(187));
+           for i:=1 to 11 do
+           begin
+                gotoxy((s-20) div 2-2,i+1);
+                write(chr(186));
+                gotoxy((s-20) div 2+21,i+1);
+                write(chr(186));
+           end;
+           gotoxy((s-20) div 2-2,3);
+           write(chr(204));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(185));
+           gotoxy((s-20) div 2-2,13);
+           write(chr(200));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(188));
+        end;
 end;
 procedure menu3;
 var k:byte;
@@ -1519,6 +1591,33 @@ begin
      calibrate('Hit 2 for hard',s-3);
      calibrate('Hit 3 for very hard',s+2);
      calibrate('Hit 4 for master',s-1);
+     writeln;
+     calibrate('Hit esc to exit',s-2);
+     if (gfx<>-1) then
+        begin
+           gotoxy((s-20) div 2-2,1);
+           write(chr(201));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(187));
+           for i:=1 to 9 do
+           begin
+                gotoxy((s-20) div 2-2,i+1);
+                write(chr(186));
+                gotoxy((s-20) div 2+21,i+1);
+                write(chr(186));
+           end;
+           gotoxy((s-20) div 2-2,3);
+           write(chr(204));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(185));
+           gotoxy((s-20) div 2-2,11);
+           write(chr(200));
+           for i:=1 to 22 do
+               write(chr(205));
+           write(chr(188));
+        end;
 end;
 procedure menu4;
 begin
@@ -1646,7 +1745,7 @@ begin
            textcolor(txt);
            textbackground(bg);
            lowvideo;
-           x:=4;y:=4;x1:=4;
+           x:=4;y:=4;x1:=4;y1:=4;j:=4;
            repeat
                 if (username='') or (length(username)>16) then username:='Guest';
                 menu1;
@@ -1763,6 +1862,8 @@ begin
                                         textmode(c80);
                                    end;
                            end;
+                           textbackground(bg);
+                           textcolor(txt);
                            writef1;
                         end;}
                         if ch4='6' then
@@ -2012,23 +2113,102 @@ begin
                 if (ch='3') and (checkfile('save.txt')=true) then break;
                 if ch='5' then
                 begin
-                        menu2;
-                        repeat
-                                ch2:=readkey;
-                        until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or (ch2='6')
-                        or (ch2=chr(27));
-                        val(ch2,c1,code);
-                        if ch2=chr(27) then break;
-                        if c1>0 then diff:=pow2(c1+8);
-                        if c1=0 then
+                      menu2;
+                      repeat
+                            if y1<11 then
+                                gotoxy((s-17) div 2-2,y1)
+                            else
+                                gotoxy((s-17) div 2-2,y1+1);
+                            write('->');
+                            repeat
+                            ch2:=readkey;
+                            until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or
+                            (ch2='6') or (ch2=chr(27)) or (ch2=#72) or (ch2=#80) or (ch2=#13);
+                            if (ch2=#72) and (y1>4) then
+                            begin
+                                 if y1<11 then
+                                     gotoxy((s-17) div 2-2,y1)
+                                 else
+                                     gotoxy((s-17) div 2-2,y1+1);
+                                 write('  ');
+                                 y1:=y1-1;
+                            end;
+                            if (ch2=#80) and (y1<11) then
+                            begin
+                                 if y1<11 then
+                                     gotoxy((s-17) div 2-2,y1)
+                                 else
+                                     gotoxy((s-17) div 2-2,y1+1);
+                                 write('  ');
+                                 y1:=y1+1;
+                            end;
+                      until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5')
+                      or (ch2='6') or (ch2=chr(27)) or (ch2=#13);
+                      if (ch2<>chr(27)) and (ch2<>#80) and (ch2<>#72) and (ch2<>#13) then
+                      begin
+                           val(ch2,c1,code);
+                           if c1>0 then diff:=pow2(c1+8);
+                           if c1=0 then diff:=1;
+                      end;
+                      if ch2=#13 then
+                      begin
+                           if (y1>4) and (y1<11) then
+                           begin
+                                diff:=pow2(y1+4);
+                                str(log2(diff)-8,s1);
+                                ch2:=s1[1];
+                           end;
+                           if y1=4 then
+                           begin
                                 diff:=1;
+                                ch2:='0';
+                           end;
+                           if y1=11 then
+                           begin
+                                str(log2(diff)-8,s1);
+                                ch2:=s1[1];
+                           end;
+                      end;
                 end;
                 if ch='6' then
                 begin
                         menu3;
                         repeat
-                                ch3:=readkey;
-                        until (ch3='0') or (ch3='1') or (ch3='2') or (ch3='3') or (ch3='4');
+                              if j<9 then
+                                  gotoxy((s-17) div 2-2,j)
+                              else
+                                  gotoxy((s-17) div 2-2,j+1);
+                              write('->');
+                              repeat
+                                    ch4:=readkey;
+                              until (ch4='0') or (ch4='1') or (ch4='2') or (ch4='3') or
+                              (ch4='4') or (ch4=#27) or (ch4=#72) or (ch4=#80) or (ch4=#13);
+                              if (ch4=#72) and (j>4) then
+                              begin
+                                   if j<9 then
+                                       gotoxy((s-17) div 2-2,j)
+                                   else
+                                       gotoxy((s-17) div 2-2,j+1);
+                                   write('  ');
+                                   j:=j-1;
+                              end;
+                              if (ch4=#80) and (j<9) then
+                              begin
+                                   if j<9 then
+                                       gotoxy((s-17) div 2-2,j)
+                                   else
+                                       gotoxy((s-17) div 2-2,j+1);
+                                   write('  ');
+                                   j:=j+1;
+                              end;
+                        until (ch4='0') or (ch4='1') or (ch4='2') or (ch4='3') or
+                        (ch4='4') or (ch4=#27) or (ch4=#13);
+                        if (ch4<>#27) and (ch4<>#13) then ch3:=ch4;
+                        if (ch4=#13) and (j<9) then
+                        begin
+                             str(j-4,s1);
+                             ch3:=s1[1];
+                        end;
                 end;
            until (ch='1') or (ch='7') or (ch=chr(27));
            if ch='3' then
@@ -2139,35 +2319,7 @@ begin
                          if gfx<>1 then title else titlegfx;
                          printf;
                          writeln('YOU WON');
-                         if soun=1 then
-                         begin
-                              delay(150);
-                              Sound(650);
-                              Delay(600);
-                              NoSound;
-
-                              Delay(180);
-                              Sound(500);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-
-                              Sound(640);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-                              NoSound;
-
-                              Delay(200);
-                              Sound(770);
-                              Delay(150);
-                              nosound;
-                              Sound(770);
-                              Delay(200);
-                              NoSound;
-                         end;
+                         if soun=1 then winningtune;
                     end;
                     if lose(a,cs)=true then
                     begin
@@ -2176,23 +2328,7 @@ begin
                          if gfx<>1 then title else titlegfx;
                          printf;
                          writeln('YOU LOST');
-                         if soun=1 then
-                         begin
-                              delay(150);
-                              sound(262);
-                              delay(250);
-                              sound(147);
-                              delay(250);
-                              sound(262);
-                              delay(200);
-                              sound(196);
-                              delay(200);
-                              nosound;
-                              delay(500);
-                              sound(131);
-                              delay(520);
-                              nosound;
-                         end;
+                         if soun=1 then losingtune;
                     end;
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
@@ -2312,35 +2448,7 @@ begin
                          if gfx<>1 then title else titlegfx;
                          printfmulti;
                          writeln('PLAYER 1 WON');
-                         if soun=1 then
-                         begin
-                              delay(150);
-                              Sound(650);
-                              Delay(600);
-                              NoSound;
-
-                              Delay(180);
-                              Sound(500);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-
-                              Sound(640);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-                              NoSound;
-
-                              Delay(200);
-                              Sound(770);
-                              Delay(150);
-                              nosound;
-                              Sound(770);
-                              Delay(200);
-                              NoSound;
-                         end;
+                         if soun=1 then winningtune;
                     end;
                     if (win(d,diff,cs)=true) or (lose(a,cs)=true) then
                     begin
@@ -2349,35 +2457,7 @@ begin
                          if gfx<>1 then title else titlegfx;
                          printfmulti;
                          writeln('PLAYER 2 WON');
-                         if soun=1 then
-                         begin
-                              delay(150);
-                              Sound(650);
-                              Delay(600);
-                              NoSound;
-
-                              Delay(180);
-                              Sound(500);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-
-                              Sound(640);
-                              Delay(150);
-
-                              Sound(570);
-                              Delay(150);
-                              NoSound;
-
-                              Delay(200);
-                              Sound(770);
-                              Delay(150);
-                              nosound;
-                              Sound(770);
-                              Delay(200);
-                              NoSound;
-                         end;
+                         if soun=1 then winningtune;
                     end;
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
