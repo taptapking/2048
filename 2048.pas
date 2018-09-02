@@ -381,7 +381,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start(var a: mang);{spawn random numbers on P1 board when starting the game}
+procedure start(var a: mang);{spawn random numbers on P1 and/or P2 board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -403,7 +403,7 @@ begin
      end;
 end;
 
-procedure spawn;{spawn random number on P1 board when the player make a legit move}
+procedure spawn(var a: mang);{spawn random number on P1 and/or P2 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -421,26 +421,6 @@ begin
           repeat
                 a[i,j]:=random(5);
           until a[i,j] mod 2=0;
-     end;
-end;
-procedure spawn1;{spawn random number on P2 board when the player make a legit move}
-var i,j:byte;
-    check:boolean;
-begin
-     randomize;
-     check:=false;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if d[i,j]=0 then check:=true;
-     if check=true then
-     begin
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(5);
-          until d[i,j] mod 2=0;
      end;
 end;
 procedure spawnhardrock;{spawn larger random number on P1 board when the player make a legit move}
@@ -2262,7 +2242,7 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn
+                                     spawn(a)
                                   else
                                       spawnhardrock;
                               count:=count+1;
@@ -2359,7 +2339,7 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn
+                                     spawn(a)
                                   else
                                       spawnhardrock;
                               count:=count+1;
@@ -2389,7 +2369,7 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn1
+                                     spawn(d)
                                   else
                                       spawnhardrock1;
                               count1:=count1+1;
