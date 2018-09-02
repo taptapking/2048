@@ -423,7 +423,7 @@ begin
           until a[i,j] mod 2=0;
      end;
 end;
-procedure spawnhardrock;{spawn larger random number on P1 board when the player make a legit move}
+procedure spawnhardrock(var a: mang);{spawn larger random number on P1 and/or P2 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -441,26 +441,6 @@ begin
           repeat
                 a[i,j]:=random(9);
           until (a[i,j] mod 2=0) and (a[i,j]<>6);
-     end;
-end;
-procedure spawnhardrock1;{spawn larger random number on P2 board when the player make a legit move}
-var i,j:byte;
-    check:boolean;
-begin
-     randomize;
-     check:=false;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if d[i,j]=0 then check:=true;
-     if check=true then
-     begin
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(9);
-          until (d[i,j] mod 2=0) and (d[i,j]<>6);
      end;
 end;
 function health(a:mang;cs:byte):byte;{generates health bar value}
@@ -2244,7 +2224,7 @@ begin
                                   if hardrock=-1 then
                                      spawn(a)
                                   else
-                                      spawnhardrock;
+                                      spawnhardrock(a);
                               count:=count+1;
                          end;
                     end;
@@ -2341,7 +2321,7 @@ begin
                                   if hardrock=-1 then
                                      spawn(a)
                                   else
-                                      spawnhardrock;
+                                      spawnhardrock(a);
                               count:=count+1;
                          end;
                     end;
@@ -2371,7 +2351,7 @@ begin
                                   if hardrock=-1 then
                                      spawn(d)
                                   else
-                                      spawnhardrock1;
+                                      spawnhardrock(d);
                               count1:=count1+1;
                          end;
                     end;
