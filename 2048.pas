@@ -302,33 +302,19 @@ begin
      if chk=true then close(f);
      checkfile:=chk;
 end;
-procedure rewind;{rewind a move on P1 Board}
+procedure rewind(var a, c: mang);{rewind a move on player's Board}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              a[i,j]:=c[i,j];
 end;
-procedure rewind1;{rewind a move on P2 Board}
-var i,j:byte;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             d[i,j]:=e[i,j];
-end;
-procedure backup;{backup the recent move from P1 board to rewind later}
+procedure backup(var a, c: mang);{backup the recent move from player's board to rewind later}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              c[i,j]:=a[i,j];
-end;
-procedure backup1;{backup the recent move from P2 board to rewind later}
-var i,j:byte;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             e[i,j]:=d[i,j];
 end;
 function difference(a,b:mang;cs:byte):boolean;{check the difference between 2 boards}
 var i,j:byte;
@@ -2086,7 +2072,7 @@ begin
                     repeat
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27));
-                    if (count>0) and (ch=re) and (moved=true) then rewind;
+                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2094,7 +2080,7 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup;
+                         backup(a, c);
                          move(ch, a);
                          if spunout<>1 then
                             clear(ch, a)
@@ -2182,8 +2168,8 @@ begin
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27))
                     or (ch=up1) or (ch=down1) or (ch=left1) or (ch=right1) or (ch=re1);
-                    if (count>0) and (ch=re) and (moved=true) then rewind;
-                    if (count1>0) and (ch=re1) and (moved1=true) then rewind1;
+                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
+                    if (count1>0) and (ch=re1) and (moved1=true) then rewind(d, e);
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2191,7 +2177,7 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup;
+                         backup(a, c);
                          move(ch, a);
                          if spunout<>1 then
                             clear(ch, a)
@@ -2221,7 +2207,7 @@ begin
                          if (ch=up1) and (x1>1) then x1:=x1-1;
                          if (ch=down1) and (x1<cs-1) then x1:=x1+1;
                          moved1:=true;
-                         backup1;
+                         backup(d, e);
                          move(ch, d);
                          if spunout<>1 then
                             clear(ch, d)
