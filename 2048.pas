@@ -1072,7 +1072,7 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure clear(c:char);  {combines 2 numbers when they collide on P1 Board}
+procedure clear(c:char; var a: mang);  {combines 2 numbers when they collide on P1 Board}
 var i,j,k:byte;
 begin
      if c=up then
@@ -1108,43 +1108,6 @@ begin
                      a[i,j]:=0;
                 end;
      move(c, a);
-end;
-procedure clear1(c:char);{combines 2 numbers when they collide on P2 board}
-var i,j,k:byte;
-begin
-     if c=up1 then
-        for i:=0 to cs-1 do
-            for j:=0 to cs do
-                if d[i,j]=d[i+1,j] then
-                begin
-                     d[i,j]:=d[i,j]+d[i+1,j];
-                     d[i+1,j]:=0;
-                end;
-     if c=down1 then
-        for i:=cs-1 downto 0 do
-            for j:=0 to cs do
-                if d[i,j]=d[i+1,j] then
-                begin
-                     d[i+1,j]:=d[i,j]+d[i+1,j];
-                     d[i,j]:=0;
-                end;
-     if c=left1 then
-        for i:=0 to cs do
-            for j:=0 to cs-1 do
-                if d[i,j]=d[i,j+1] then
-                begin
-                     d[i,j]:=d[i,j]+d[i,j+1];
-                     d[i,j+1]:=0;
-                end;
-     if c=right1 then
-        for i:=0 to cs do
-            for j:=cs-1 downto 0 do
-                if d[i,j]=d[i,j+1] then
-                begin
-                     d[i,j+1]:=d[i,j]+d[i,j+1];
-                     d[i,j]:=0;
-                end;
-     move(c, d);
 end;
 procedure readf;    {reads configurations from a file}
 var f:text;
@@ -2134,10 +2097,10 @@ begin
                          backup;
                          move(ch, a);
                          if spunout<>1 then
-                            clear(ch)
+                            clear(ch, a)
                          else
                              for i:=1 to 11 do
-                                 clear(ch);
+                                 clear(ch, a);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2231,10 +2194,10 @@ begin
                          backup;
                          move(ch, a);
                          if spunout<>1 then
-                            clear(ch)
+                            clear(ch, a)
                          else
                              for i:=1 to 11 do
-                                 clear(ch);
+                                 clear(ch, a);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2261,10 +2224,10 @@ begin
                          backup1;
                          move(ch, d);
                          if spunout<>1 then
-                            clear1(ch)
+                            clear(ch, d)
                          else
                              for i:=1 to 11 do
-                                 clear1(ch);
+                                 clear(ch, d);
                          if difference(d,e,cs)=true then
                          begin
                               if soun=1 then
