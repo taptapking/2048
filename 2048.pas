@@ -381,7 +381,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start;{spawn random numbers on P1 board when starting the game}
+procedure start(var a: mang);{spawn random numbers on P1 board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -402,27 +402,7 @@ begin
           until (a[i,j]=2) or (a[i,j]=4);
      end;
 end;
-procedure start1;{spawn random numbers on P2 board when starting the game}
-var i,j,k:byte;
-    check:boolean;
-begin
-     randomize;
-     for k:=1 to cs do
-     begin
-          check:=false;
-          for i:=0 to cs do
-              for j:=0 to cs do
-                  if d[i,j]=0 then check:=true;
-          if check=true then
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(5);
-          until (d[i,j]=2) or (d[i,j]=4);
-     end;
-end;
+
 procedure spawn;{spawn random number on P1 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
@@ -2245,7 +2225,8 @@ begin
                         a[i,j]:=0;
                         d[i,j]:=0;
                     end;
-                start;start1;
+                start(a);
+                start(d);
            end;
            if (ch='1') or (ch='3') then
            begin
