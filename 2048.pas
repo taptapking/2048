@@ -1017,7 +1017,7 @@ begin
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
-procedure move(c:char); {moves all number to a side of P1 board}
+procedure move(c:char; var a: mang); {moves all number to a side of P1 board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1072,61 +1072,6 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure move1(c:char);  {moves all numbers to a side of P2 board}
-var i,j,n:byte;
-    b:array[0..10,0..10] of longint;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             b[i,j]:=0;
-     if c=up1 then
-        for j:=0 to cs do
-        begin
-             n:=0;
-             for i:=0 to cs do
-                 if d[i,j]<>0 then
-                 begin
-                      b[n,j]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=down1 then
-        for j:=0 to cs do
-        begin
-             n:=0;
-             for i:=cs downto 0 do
-                 if d[i,j]<>0 then
-                 begin
-                      b[cs-n,j]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=left1 then
-        for i:=0 to cs do
-        begin
-             n:=0;
-             for j:=0 to cs do
-                 if d[i,j]<>0 then
-                 begin
-                      b[i,n]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=right1 then
-        for i:=0 to cs do
-        begin
-             n:=0;
-             for j:=cs downto 0 do
-                 if d[i,j]<>0 then
-                 begin
-                      b[i,cs-n]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-        for i:=0 to cs do
-            for j:=0 to cs do
-                d[i,j]:=b[i,j];
-end;
 procedure clear(c:char);  {combines 2 numbers when they collide on P1 Board}
 var i,j,k:byte;
 begin
@@ -1162,7 +1107,7 @@ begin
                      a[i,j+1]:=a[i,j]+a[i,j+1];
                      a[i,j]:=0;
                 end;
-     move(c);
+     move(c, a);
 end;
 procedure clear1(c:char);{combines 2 numbers when they collide on P2 board}
 var i,j,k:byte;
@@ -1199,7 +1144,7 @@ begin
                      d[i,j+1]:=d[i,j]+d[i,j+1];
                      d[i,j]:=0;
                 end;
-     move1(c);
+     move(c, d);
 end;
 procedure readf;    {reads configurations from a file}
 var f:text;
@@ -2187,7 +2132,7 @@ begin
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
                          backup;
-                         move(ch);
+                         move(ch, a);
                          if spunout<>1 then
                             clear(ch)
                          else
@@ -2284,7 +2229,7 @@ begin
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
                          backup;
-                         move(ch);
+                         move(ch, a);
                          if spunout<>1 then
                             clear(ch)
                          else
@@ -2314,7 +2259,7 @@ begin
                          if (ch=down1) and (x1<cs-1) then x1:=x1+1;
                          moved1:=true;
                          backup1;
-                         move1(ch);
+                         move(ch, d);
                          if spunout<>1 then
                             clear1(ch)
                          else
