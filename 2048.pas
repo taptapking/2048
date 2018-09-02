@@ -270,7 +270,7 @@ begin
      pt:=pt*(diff+1);
      point:=pt;
 end;
-procedure conti(var a: mang);{delete 2 lowest numbers on P1 and/or P2 Board when there are no moves left to prevent game-over when using No-Fail}
+procedure conti(var a: mang);{delete 2 lowest numbers on player's Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -362,7 +362,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start(var a: mang);{spawn random numbers on P1 and/or P2 board when starting the game}
+procedure start(var a: mang);{spawn random numbers on player's board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -384,7 +384,7 @@ begin
      end;
 end;
 
-procedure spawn(var a: mang);{spawn random number on P1 and/or P2 board when the player make a legit move}
+procedure spawn(var a: mang);{spawn random number on player's board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -404,7 +404,7 @@ begin
           until a[i,j] mod 2=0;
      end;
 end;
-procedure spawnhardrock(var a: mang);{spawn larger random number on P1 and/or P2 board when the player make a legit move}
+procedure spawnhardrock(var a: mang);{spawn larger random number on player's board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -1017,7 +1017,7 @@ begin
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
-procedure move(c:char; var a: mang); {moves all number to a side of P1 board}
+procedure move(c:char; var a: mang); {moves all number to a side of player's board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1072,7 +1072,7 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure clear(c:char; var a: mang);  {combines 2 numbers when they collide on P1 Board}
+procedure clear(c:char; var a: mang);  {combines 2 numbers when they collide on player's Board}
 var i,j,k:byte;
 begin
      if c=up then
