@@ -270,7 +270,7 @@ begin
      pt:=pt*(diff+1);
      point:=pt;
 end;
-procedure continue;{delete 2 lowest numbers on P1 Board when there are no moves left to prevent game-over when using No-Fail}
+procedure conti(var a: mang);{delete 2 lowest numbers on P1 and/or P2 Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -288,25 +288,6 @@ begin
      for i:=0 to cs do
          for j:=0 to cs do
              if (a[i,j]=b[1]) or (a[i,j]=b[2]) then a[i,j]:=0;
-end;
-procedure continue1;{delete 2 lowest numbers on P2 Board when there are no moves left to prevent game-over when using No-Fail}
-var b:array[1..121] of longint;
-    tmp:longint;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             b[i*(cs+1)+(j+1)]:=d[i,j];
-     for i:=1 to sqr(cs+1)-1 do
-         for j:=i+1 to sqr(cs+1) do
-             if  b[i]>b[j] then
-             begin
-                  tmp:=b[i];
-                  b[i]:=b[j];
-                  b[j]:=tmp;
-             end;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if (d[i,j]=b[1]) or (d[i,j]=b[2]) then d[i,j]:=0;
 end;
 function checkfile(fl:string):boolean;{verify if a file is avaliable}
 var f:text;
@@ -2248,7 +2229,7 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then continue;
+                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
               until (win(a,diff,cs)=true) or (lose(a,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
                  writef;
@@ -2375,8 +2356,8 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then continue;
-                    if (lose(d,cs)=true) and (nofail=1) then continue1;
+                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
+                    if (lose(d,cs)=true) and (nofail=1) then conti(d);
               until (win(a,diff,cs)=true) or (lose(a,cs)=true)
               or (win(d,diff,cs)=true) or (lose(d,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
