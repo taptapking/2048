@@ -270,7 +270,7 @@ begin
      pt:=pt*(diff+1);
      point:=pt;
 end;
-procedure continue;{delete 2 lowest numbers on P1 Board when there are no moves left to prevent game-over when using No-Fail}
+procedure conti(var a: mang);{delete 2 lowest numbers on player's Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -289,25 +289,6 @@ begin
          for j:=0 to cs do
              if (a[i,j]=b[1]) or (a[i,j]=b[2]) then a[i,j]:=0;
 end;
-procedure continue1;{delete 2 lowest numbers on P2 Board when there are no moves left to prevent game-over when using No-Fail}
-var b:array[1..121] of longint;
-    tmp:longint;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             b[i*(cs+1)+(j+1)]:=d[i,j];
-     for i:=1 to sqr(cs+1)-1 do
-         for j:=i+1 to sqr(cs+1) do
-             if  b[i]>b[j] then
-             begin
-                  tmp:=b[i];
-                  b[i]:=b[j];
-                  b[j]:=tmp;
-             end;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if (d[i,j]=b[1]) or (d[i,j]=b[2]) then d[i,j]:=0;
-end;
 function checkfile(fl:string):boolean;{verify if a file is avaliable}
 var f:text;
     chk:boolean;
@@ -321,33 +302,19 @@ begin
      if chk=true then close(f);
      checkfile:=chk;
 end;
-procedure rewind;{rewind a move on P1 Board}
+procedure rewind(var a, c: mang);{rewind a move on player's Board}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              a[i,j]:=c[i,j];
 end;
-procedure rewind1;{rewind a move on P2 Board}
-var i,j:byte;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             d[i,j]:=e[i,j];
-end;
-procedure backup;{backup the recent move from P1 board to rewind later}
+procedure backup(var a, c: mang);{backup the recent move from player's board to rewind later}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              c[i,j]:=a[i,j];
-end;
-procedure backup1;{backup the recent move from P2 board to rewind later}
-var i,j:byte;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             e[i,j]:=d[i,j];
 end;
 function difference(a,b:mang;cs:byte):boolean;{check the difference between 2 boards}
 var i,j:byte;
@@ -381,7 +348,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start;{spawn random numbers on P1 board when starting the game}
+procedure start(var a: mang);{spawn random numbers on player's board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -402,28 +369,8 @@ begin
           until (a[i,j]=2) or (a[i,j]=4);
      end;
 end;
-procedure start1;{spawn random numbers on P2 board when starting the game}
-var i,j,k:byte;
-    check:boolean;
-begin
-     randomize;
-     for k:=1 to cs do
-     begin
-          check:=false;
-          for i:=0 to cs do
-              for j:=0 to cs do
-                  if d[i,j]=0 then check:=true;
-          if check=true then
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(5);
-          until (d[i,j]=2) or (d[i,j]=4);
-     end;
-end;
-procedure spawn;{spawn random number on P1 board when the player make a legit move}
+
+procedure spawn(var a: mang);{spawn random number on player's board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -443,27 +390,7 @@ begin
           until a[i,j] mod 2=0;
      end;
 end;
-procedure spawn1;{spawn random number on P2 board when the player make a legit move}
-var i,j:byte;
-    check:boolean;
-begin
-     randomize;
-     check:=false;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if d[i,j]=0 then check:=true;
-     if check=true then
-     begin
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(5);
-          until d[i,j] mod 2=0;
-     end;
-end;
-procedure spawnhardrock;{spawn larger random number on P1 board when the player make a legit move}
+procedure spawnhardrock(var a: mang);{spawn larger random number on player's board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -481,26 +408,6 @@ begin
           repeat
                 a[i,j]:=random(9);
           until (a[i,j] mod 2=0) and (a[i,j]<>6);
-     end;
-end;
-procedure spawnhardrock1;{spawn larger random number on P2 board when the player make a legit move}
-var i,j:byte;
-    check:boolean;
-begin
-     randomize;
-     check:=false;
-     for i:=0 to cs do
-         for j:=0 to cs do
-             if d[i,j]=0 then check:=true;
-     if check=true then
-     begin
-          repeat
-                i:=random(cs+1);
-                j:=random(cs+1);
-          until d[i,j]=0;
-          repeat
-                d[i,j]:=random(9);
-          until (d[i,j] mod 2=0) and (d[i,j]<>6);
      end;
 end;
 function health(a:mang;cs:byte):byte;{generates health bar value}
@@ -1096,7 +1003,7 @@ begin
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
-procedure move(c:char); {moves all number to a side of P1 board}
+procedure move(c:char; var a: mang); {moves all number to a side of player's board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1151,62 +1058,7 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure move1(c:char);  {moves all numbers to a side of P2 board}
-var i,j,n:byte;
-    b:array[0..10,0..10] of longint;
-begin
-     for i:=0 to cs do
-         for j:=0 to cs do
-             b[i,j]:=0;
-     if c=up1 then
-        for j:=0 to cs do
-        begin
-             n:=0;
-             for i:=0 to cs do
-                 if d[i,j]<>0 then
-                 begin
-                      b[n,j]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=down1 then
-        for j:=0 to cs do
-        begin
-             n:=0;
-             for i:=cs downto 0 do
-                 if d[i,j]<>0 then
-                 begin
-                      b[cs-n,j]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=left1 then
-        for i:=0 to cs do
-        begin
-             n:=0;
-             for j:=0 to cs do
-                 if d[i,j]<>0 then
-                 begin
-                      b[i,n]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-     if c=right1 then
-        for i:=0 to cs do
-        begin
-             n:=0;
-             for j:=cs downto 0 do
-                 if d[i,j]<>0 then
-                 begin
-                      b[i,cs-n]:=d[i,j];
-                      n:=n+1;
-                 end;
-        end;
-        for i:=0 to cs do
-            for j:=0 to cs do
-                d[i,j]:=b[i,j];
-end;
-procedure clear(c:char);  {combines 2 numbers when they collide on P1 Board}
+procedure clear(c:char; var a: mang);  {combines 2 numbers when they collide on player's Board}
 var i,j,k:byte;
 begin
      if c=up then
@@ -1241,44 +1093,7 @@ begin
                      a[i,j+1]:=a[i,j]+a[i,j+1];
                      a[i,j]:=0;
                 end;
-     move(c);
-end;
-procedure clear1(c:char);{combines 2 numbers when they collide on P2 board}
-var i,j,k:byte;
-begin
-     if c=up1 then
-        for i:=0 to cs-1 do
-            for j:=0 to cs do
-                if d[i,j]=d[i+1,j] then
-                begin
-                     d[i,j]:=d[i,j]+d[i+1,j];
-                     d[i+1,j]:=0;
-                end;
-     if c=down1 then
-        for i:=cs-1 downto 0 do
-            for j:=0 to cs do
-                if d[i,j]=d[i+1,j] then
-                begin
-                     d[i+1,j]:=d[i,j]+d[i+1,j];
-                     d[i,j]:=0;
-                end;
-     if c=left1 then
-        for i:=0 to cs do
-            for j:=0 to cs-1 do
-                if d[i,j]=d[i,j+1] then
-                begin
-                     d[i,j]:=d[i,j]+d[i,j+1];
-                     d[i,j+1]:=0;
-                end;
-     if c=right1 then
-        for i:=0 to cs do
-            for j:=cs-1 downto 0 do
-                if d[i,j]=d[i,j+1] then
-                begin
-                     d[i,j+1]:=d[i,j]+d[i,j+1];
-                     d[i,j]:=0;
-                end;
-     move1(c);
+     move(c, a);
 end;
 procedure readf;    {reads configurations from a file}
 var f:text;
@@ -2245,7 +2060,8 @@ begin
                         a[i,j]:=0;
                         d[i,j]:=0;
                     end;
-                start;start1;
+                start(a);
+                start(d);
            end;
            if (ch='1') or (ch='3') then
            begin
@@ -2256,7 +2072,7 @@ begin
                     repeat
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27));
-                    if (count>0) and (ch=re) and (moved=true) then rewind;
+                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2264,13 +2080,13 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup;
-                         move(ch);
+                         backup(a, c);
+                         move(ch, a);
                          if spunout<>1 then
-                            clear(ch)
+                            clear(ch, a)
                          else
                              for i:=1 to 11 do
-                                 clear(ch);
+                                 clear(ch, a);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2281,9 +2097,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn
+                                     spawn(a)
                                   else
-                                      spawnhardrock;
+                                      spawnhardrock(a);
                               count:=count+1;
                          end;
                     end;
@@ -2307,7 +2123,7 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then continue;
+                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
               until (win(a,diff,cs)=true) or (lose(a,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
                  writef;
@@ -2352,8 +2168,8 @@ begin
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27))
                     or (ch=up1) or (ch=down1) or (ch=left1) or (ch=right1) or (ch=re1);
-                    if (count>0) and (ch=re) and (moved=true) then rewind;
-                    if (count1>0) and (ch=re1) and (moved1=true) then rewind1;
+                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
+                    if (count1>0) and (ch=re1) and (moved1=true) then rewind(d, e);
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2361,13 +2177,13 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup;
-                         move(ch);
+                         backup(a, c);
+                         move(ch, a);
                          if spunout<>1 then
-                            clear(ch)
+                            clear(ch, a)
                          else
                              for i:=1 to 11 do
-                                 clear(ch);
+                                 clear(ch, a);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2378,9 +2194,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn
+                                     spawn(a)
                                   else
-                                      spawnhardrock;
+                                      spawnhardrock(a);
                               count:=count+1;
                          end;
                     end;
@@ -2391,13 +2207,13 @@ begin
                          if (ch=up1) and (x1>1) then x1:=x1-1;
                          if (ch=down1) and (x1<cs-1) then x1:=x1+1;
                          moved1:=true;
-                         backup1;
-                         move1(ch);
+                         backup(d, e);
+                         move(ch, d);
                          if spunout<>1 then
-                            clear1(ch)
+                            clear(ch, d)
                          else
                              for i:=1 to 11 do
-                                 clear1(ch);
+                                 clear(ch, d);
                          if difference(d,e,cs)=true then
                          begin
                               if soun=1 then
@@ -2408,9 +2224,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn1
+                                     spawn(d)
                                   else
-                                      spawnhardrock1;
+                                      spawnhardrock(d);
                               count1:=count1+1;
                          end;
                     end;
@@ -2434,8 +2250,8 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then continue;
-                    if (lose(d,cs)=true) and (nofail=1) then continue1;
+                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
+                    if (lose(d,cs)=true) and (nofail=1) then conti(d);
               until (win(a,diff,cs)=true) or (lose(a,cs)=true)
               or (win(d,diff,cs)=true) or (lose(d,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
