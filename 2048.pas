@@ -21,7 +21,7 @@ var a,d,c,e:mang;
         fmove,fnum:longint;
         moved,moved1,loaded,wide:boolean;
         hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun,nofail1:shortint;
-        cs,s,x,y,x1,y1:byte;
+        cs,s,x,y,x1,y1,xx,yy,xx1,yy1:byte;
         username,s1:string;
 procedure losingtune;
 begin
@@ -270,7 +270,7 @@ begin
      pt:=pt*(diff+1);
      point:=pt;
 end;
-procedure conti(var a: mang);{delete 2 lowest numbers on player's Board when there are no moves left to prevent game-over when using No-Fail}
+procedure continue;{delete 2 lowest numbers on P1 Board when there are no moves left to prevent game-over when using No-Fail}
 var b:array[1..121] of longint;
     tmp:longint;
 begin
@@ -289,6 +289,25 @@ begin
          for j:=0 to cs do
              if (a[i,j]=b[1]) or (a[i,j]=b[2]) then a[i,j]:=0;
 end;
+procedure continue1;{delete 2 lowest numbers on P2 Board when there are no moves left to prevent game-over when using No-Fail}
+var b:array[1..121] of longint;
+    tmp:longint;
+begin
+     for i:=0 to cs do
+         for j:=0 to cs do
+             b[i*(cs+1)+(j+1)]:=d[i,j];
+     for i:=1 to sqr(cs+1)-1 do
+         for j:=i+1 to sqr(cs+1) do
+             if  b[i]>b[j] then
+             begin
+                  tmp:=b[i];
+                  b[i]:=b[j];
+                  b[j]:=tmp;
+             end;
+     for i:=0 to cs do
+         for j:=0 to cs do
+             if (d[i,j]=b[1]) or (d[i,j]=b[2]) then d[i,j]:=0;
+end;
 function checkfile(fl:string):boolean;{verify if a file is avaliable}
 var f:text;
     chk:boolean;
@@ -302,19 +321,33 @@ begin
      if chk=true then close(f);
      checkfile:=chk;
 end;
-procedure rewind(var a, c: mang);{rewind a move on player's Board}
+procedure rewind;{rewind a move on P1 Board}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              a[i,j]:=c[i,j];
 end;
-procedure backup(var a, c: mang);{backup the recent move from player's board to rewind later}
+procedure rewind1;{rewind a move on P2 Board}
+var i,j:byte;
+begin
+     for i:=0 to cs do
+         for j:=0 to cs do
+             d[i,j]:=e[i,j];
+end;
+procedure backup;{backup the recent move from P1 board to rewind later}
 var i,j:byte;
 begin
      for i:=0 to cs do
          for j:=0 to cs do
              c[i,j]:=a[i,j];
+end;
+procedure backup1;{backup the recent move from P2 board to rewind later}
+var i,j:byte;
+begin
+     for i:=0 to cs do
+         for j:=0 to cs do
+             e[i,j]:=d[i,j];
 end;
 function difference(a,b:mang;cs:byte):boolean;{check the difference between 2 boards}
 var i,j:byte;
@@ -348,7 +381,7 @@ begin
          for j:=0 to cs do
              if a[i,j]=0 then lose:=false;
 end;
-procedure start(var a: mang);{spawn random numbers on player's board when starting the game}
+procedure start;{spawn random numbers on P1 board when starting the game}
 var i,j,k:byte;
     check:boolean;
 begin
@@ -369,8 +402,28 @@ begin
           until (a[i,j]=2) or (a[i,j]=4);
      end;
 end;
-
-procedure spawn(var a: mang);{spawn random number on player's board when the player make a legit move}
+procedure start1;{spawn random numbers on P2 board when starting the game}
+var i,j,k:byte;
+    check:boolean;
+begin
+     randomize;
+     for k:=1 to cs do
+     begin
+          check:=false;
+          for i:=0 to cs do
+              for j:=0 to cs do
+                  if d[i,j]=0 then check:=true;
+          if check=true then
+          repeat
+                i:=random(cs+1);
+                j:=random(cs+1);
+          until d[i,j]=0;
+          repeat
+                d[i,j]:=random(5);
+          until (d[i,j]=2) or (d[i,j]=4);
+     end;
+end;
+procedure spawn;{spawn random number on P1 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -390,7 +443,27 @@ begin
           until a[i,j] mod 2=0;
      end;
 end;
-procedure spawnhardrock(var a: mang);{spawn larger random number on player's board when the player make a legit move}
+procedure spawn1;{spawn random number on P2 board when the player make a legit move}
+var i,j:byte;
+    check:boolean;
+begin
+     randomize;
+     check:=false;
+     for i:=0 to cs do
+         for j:=0 to cs do
+             if d[i,j]=0 then check:=true;
+     if check=true then
+     begin
+          repeat
+                i:=random(cs+1);
+                j:=random(cs+1);
+          until d[i,j]=0;
+          repeat
+                d[i,j]:=random(5);
+          until d[i,j] mod 2=0;
+     end;
+end;
+procedure spawnhardrock;{spawn larger random number on P1 board when the player make a legit move}
 var i,j:byte;
     check:boolean;
 begin
@@ -408,6 +481,26 @@ begin
           repeat
                 a[i,j]:=random(9);
           until (a[i,j] mod 2=0) and (a[i,j]<>6);
+     end;
+end;
+procedure spawnhardrock1;{spawn larger random number on P2 board when the player make a legit move}
+var i,j:byte;
+    check:boolean;
+begin
+     randomize;
+     check:=false;
+     for i:=0 to cs do
+         for j:=0 to cs do
+             if d[i,j]=0 then check:=true;
+     if check=true then
+     begin
+          repeat
+                i:=random(cs+1);
+                j:=random(cs+1);
+          until d[i,j]=0;
+          repeat
+                d[i,j]:=random(9);
+          until (d[i,j] mod 2=0) and (d[i,j]<>6);
      end;
 end;
 function health(a:mang;cs:byte):byte;{generates health bar value}
@@ -530,8 +623,8 @@ begin
                         if color<>-1 then
                         begin
                                 textbackground(round(log2(a[i,j])));
-                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                then textbackground(round(log2(a[i,j])-1));
+                                if (round(log2(a[i,j]))=txt) or (round(log2(a[i,j]))-8=txt) or (round(log2(a[i,j]))+8=txt)
+                                then textbackground(round(log2(a[i,j]))-1);
                         end;{generate colors when color is enabled}
                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
                         if (a[i,j]>16) and (hidden=1) then {prints numbers when hidden mod is enabled}
@@ -568,6 +661,7 @@ begin
                                         begin
                                                 textbackground(round(log2(a[i,j])));
                                                 if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                                or (round(log2(a[i,j]))=txt)
                                                 then textbackground(round(log2(a[i,j])-1));
                                         end;{generate colors when color is enabled}
                                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
@@ -610,6 +704,7 @@ begin
                                   begin
                                         textbackground(round(log2(a[i,j])));
                                         if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                        or (round(log2(a[i,j]))=txt)
                                         then textbackground(round(log2(a[i,j])-1));
                                   end;{generate colors when color is enabled}
                                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
@@ -753,6 +848,7 @@ begin
                         begin
                                 textbackground(round(log2(a[i,j])));
                                 if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                or (round(log2(a[i,j]))=txt)
                                 then textbackground(round(log2(a[i,j])-1));
                         end;
                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
@@ -789,6 +885,7 @@ begin
                                         begin
                                                 textbackground(round(log2(a[i,j])));
                                                 if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                                or (round(log2(a[i,j]))=txt)
                                                 then textbackground(round(log2(a[i,j])-1));
                                         end;
                                         if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
@@ -831,6 +928,7 @@ begin
                                   begin
                                         textbackground(round(log2(a[i,j])));
                                         if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
+                                        or (round(log2(a[i,j]))=txt)
                                         then textbackground(round(log2(a[i,j])-1));
                                   end;
                                   if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
@@ -874,6 +972,7 @@ begin
                         begin
                                 textbackground(round(log2(d[i,j])));
                                 if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
+                                or (round(log2(d[i,j]))=txt)
                                 then textbackground(round(log2(d[i,j])-1));
                         end;
                         if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
@@ -909,6 +1008,7 @@ begin
                                         begin
                                                 textbackground(round(log2(d[i,j])));
                                                 if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
+                                                or (round(log2(d[i,j]))=txt)
                                                 then textbackground(round(log2(d[i,j])-1));
                                         end;
                                         if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
@@ -951,6 +1051,7 @@ begin
                                   begin
                                         textbackground(round(log2(d[i,j])));
                                         if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
+                                        or (round(log2(d[i,j]))=txt)
                                         then textbackground(round(log2(d[i,j])-1));
                                   end;
                                   if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
@@ -1003,7 +1104,7 @@ begin
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
-procedure move(c:char; var a: mang); {moves all number to a side of player's board}
+procedure move(c:char); {moves all number to a side of P1 board}
 var i,j,n:byte;
     b:array[0..10,0..10] of longint;
 begin
@@ -1058,7 +1159,62 @@ begin
             for j:=0 to cs do
                 a[i,j]:=b[i,j];
 end;
-procedure clear(c:char; var a: mang);  {combines 2 numbers when they collide on player's Board}
+procedure move1(c:char);  {moves all numbers to a side of P2 board}
+var i,j,n:byte;
+    b:array[0..10,0..10] of longint;
+begin
+     for i:=0 to cs do
+         for j:=0 to cs do
+             b[i,j]:=0;
+     if c=up1 then
+        for j:=0 to cs do
+        begin
+             n:=0;
+             for i:=0 to cs do
+                 if d[i,j]<>0 then
+                 begin
+                      b[n,j]:=d[i,j];
+                      n:=n+1;
+                 end;
+        end;
+     if c=down1 then
+        for j:=0 to cs do
+        begin
+             n:=0;
+             for i:=cs downto 0 do
+                 if d[i,j]<>0 then
+                 begin
+                      b[cs-n,j]:=d[i,j];
+                      n:=n+1;
+                 end;
+        end;
+     if c=left1 then
+        for i:=0 to cs do
+        begin
+             n:=0;
+             for j:=0 to cs do
+                 if d[i,j]<>0 then
+                 begin
+                      b[i,n]:=d[i,j];
+                      n:=n+1;
+                 end;
+        end;
+     if c=right1 then
+        for i:=0 to cs do
+        begin
+             n:=0;
+             for j:=cs downto 0 do
+                 if d[i,j]<>0 then
+                 begin
+                      b[i,cs-n]:=d[i,j];
+                      n:=n+1;
+                 end;
+        end;
+        for i:=0 to cs do
+            for j:=0 to cs do
+                d[i,j]:=b[i,j];
+end;
+procedure clear(c:char);  {combines 2 numbers when they collide on P1 Board}
 var i,j,k:byte;
 begin
      if c=up then
@@ -1093,7 +1249,44 @@ begin
                      a[i,j+1]:=a[i,j]+a[i,j+1];
                      a[i,j]:=0;
                 end;
-     move(c, a);
+     move(c);
+end;
+procedure clear1(c:char);{combines 2 numbers when they collide on P2 board}
+var i,j,k:byte;
+begin
+     if c=up1 then
+        for i:=0 to cs-1 do
+            for j:=0 to cs do
+                if d[i,j]=d[i+1,j] then
+                begin
+                     d[i,j]:=d[i,j]+d[i+1,j];
+                     d[i+1,j]:=0;
+                end;
+     if c=down1 then
+        for i:=cs-1 downto 0 do
+            for j:=0 to cs do
+                if d[i,j]=d[i+1,j] then
+                begin
+                     d[i+1,j]:=d[i,j]+d[i+1,j];
+                     d[i,j]:=0;
+                end;
+     if c=left1 then
+        for i:=0 to cs do
+            for j:=0 to cs-1 do
+                if d[i,j]=d[i,j+1] then
+                begin
+                     d[i,j]:=d[i,j]+d[i,j+1];
+                     d[i,j+1]:=0;
+                end;
+     if c=right1 then
+        for i:=0 to cs do
+            for j:=cs-1 downto 0 do
+                if d[i,j]=d[i,j+1] then
+                begin
+                     d[i,j+1]:=d[i,j]+d[i,j+1];
+                     d[i,j]:=0;
+                end;
+     move1(c);
 end;
 procedure readf;    {reads configurations from a file}
 var f:text;
@@ -1301,7 +1494,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.2.3',s-20);
+     calibrate('Update 5.2.4',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1551,7 +1744,7 @@ begin
      s:=80;
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
-     bg:=0;txt:=15;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
+     bg:=0;txt:=7;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
      up1:='w';down1:='s';left1:='a';right1:='d';re1:='z';
      repeat
            count:=0;count1:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
@@ -1559,33 +1752,32 @@ begin
            if s>=120 then wide:=true else wide:=false;
            textcolor(txt);
            textbackground(bg);
-           lowvideo;
-           x:=4;y:=4;x1:=4;y1:=4;j:=4;
+           xx:=4;yy:=4;xx1:=4;yy1:=4;j:=4;
            repeat
                 if (username='') or (length(username)>16) then username:='Guest';
                 menu1;
                 repeat
-                      gotoxy((s-32) div 2-2,x);write('->');
+                      gotoxy((s-32) div 2-2,xx);write('->');
                       repeat
                             ch:=readkey;
                       until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6')
-                      or ((ch='7') and (s>=80)) or ((ch=#72) and (x>4)) or ((ch=#80) and (x<12)) or (ch=#13);
+                      or ((ch='7') and (s>=80)) or ((ch=#72) and (xx>4)) or ((ch=#80) and (xx<12)) or (ch=#13);
                 if (ch=#72) then
                 begin
-                     gotoxy((s-32) div 2-2,x);write('  ');
-                     x:=x-1;
+                     gotoxy((s-32) div 2-2,xx);write('  ');
+                     xx:=xx-1;
                 end;
                 if (ch=#80) then
                 begin
-                     gotoxy((s-32) div 2-2,x);write('  ');
-                     x:=x+1;
+                     gotoxy((s-32) div 2-2,xx);write('  ');
+                     xx:=xx+1;
                 end;
                 until (ch='1') or (ch='2') or (ch='3') or (ch='4') or (ch='d') or (ch=chr(27)) or (ch='5') or (ch='6')
                 or ((ch='7') and (s>=80)) or (ch=#13);
                 if (ch=#13) then
                 begin
-                     str(x-3,s1);
-                     if not ((x-3=7) and (s<80)) then
+                     str(xx-3,s1);
+                     if not ((xx-3=7) and (s<80)) then
                         ch:=s1[1];
                      if ch='8' then ch:='d';
                      if ch='9' then ch:=#27;
@@ -1598,10 +1790,10 @@ begin
                         end;
                         menu4;
                         repeat
-                              if y<13 then
-                                 gotoxy((s-34) div 2-2,y)
+                              if yy<13 then
+                                 gotoxy((s-34) div 2-2,yy)
                               else
-                                  gotoxy((s-34) div 2-2,y+1);
+                                  gotoxy((s-34) div 2-2,yy+1);
                               write('>');
                               if (gfx=-1) or (s<80) then
                                  gotoxy(1,16);
@@ -1609,44 +1801,43 @@ begin
                                     ch4:=readkey;
                               until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
                               or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3')
-                              or ((ch4=#72) and (y>4)) or ((ch4=#80) and (y<13)) or (ch4=#13);
+                              or ((ch4=#72) and (yy>4)) or ((ch4=#80) and (yy<13)) or (ch4=#13);
                         if ch4=#72 then
                         begin
-                             if y<13 then
-                                 gotoxy((s-34) div 2-2,y)
+                             if yy<13 then
+                                 gotoxy((s-34) div 2-2,yy)
                              else
-                                 gotoxy((s-34) div 2-2,y+1);
+                                 gotoxy((s-34) div 2-2,yy+1);
                              write(' ');
-                             y:=y-1;
+                             yy:=yy-1;
                         end;
                         if ch4=#80 then
                         begin
-                             if y<13 then
-                                gotoxy((s-34) div 2-2,y)
+                             if yy<13 then
+                                gotoxy((s-34) div 2-2,yy)
                              else
-                                 gotoxy((s-34) div 2-2,y+1);
+                                 gotoxy((s-34) div 2-2,yy+1);
                              write(' ');
-                             y:=y+1;
+                             yy:=yy+1;
                         end;
                         until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
                         or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3') or (ch4=#13);
                         if ch4=#13 then
                         begin
-                             str(y-3,s1);
+                             str(yy-3,s1);
                              ch4:=s1[1];
                              if s1='10' then ch4:=#27;
                         end;
                         if ch4='1' then
                         begin
-                                bg:=0;txt:=15;
+                                bg:=0;txt:=7;
                                 textcolor(txt);
                                 textbackground(bg);
-                                lowvideo;
                                 writef1;
                         end;
                         if ch4='2' then
                         begin
-                                bg:=15;txt:=0;
+                                bg:=7;txt:=0;
                                 textcolor(txt);
                                 textbackground(bg);
                                 writef1;
@@ -1735,8 +1926,8 @@ begin
                         repeat
                                 menu5;
                                 repeat
-                                      if x1<14 then
-                                         gotoxy((s-34) div 2-2,x1)
+                                      if xx1<14 then
+                                         gotoxy((s-34) div 2-2,xx1)
                                       else
                                           gotoxy((s-28) div 2,21);
                                       write('>');
@@ -1746,31 +1937,31 @@ begin
                                             ch5:=readkey;
                                       until (ch5='1') or (ch5='2') or (ch5='3') or (ch5='4') or (ch5='5') or (ch5=chr(27))
                                       or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0')
-                                      or ((ch5=#72) and (x1>4)) or ((ch5=#80) and (x1<14)) or (ch5=#13);
+                                      or ((ch5=#72) and (xx1>4)) or ((ch5=#80) and (xx1<14)) or (ch5=#13);
                                       if ch5=#72 then
                                       begin
-                                           if x1<14 then
-                                              gotoxy((s-34) div 2-2,x1)
+                                           if xx1<14 then
+                                              gotoxy((s-34) div 2-2,xx1)
                                            else
                                                gotoxy((s-28) div 2,21);
                                            write(' ');
-                                           x1:=x1-1;
+                                           xx1:=xx1-1;
                                       end;
                                       if ch5=#80 then
                                       begin
-                                           if x1<14 then
-                                              gotoxy((s-34) div 2-2,x1)
+                                           if xx1<14 then
+                                              gotoxy((s-34) div 2-2,xx1)
                                            else
                                                gotoxy((s-28) div 2,21);
                                            write(' ');
-                                           x1:=x1+1;
+                                           xx1:=xx1+1;
                                       end;
                                 until (ch5='1') or (ch5='2') or (ch5='3') or (ch5='4') or (ch5='5') or (ch5=chr(27))
                                 or (ch5='6') or (ch5='7') or (ch5='8') or (ch5='9') or (ch5='0')
                                 or (ch5=#13);
                                 if ch5=#13 then
                                 begin
-                                     str(x1-3,s1);
+                                     str(xx1-3,s1);
                                      ch5:=s1[1];
                                      if s1='10' then ch5:='0';
                                      if s1='11' then ch5:=#27;
@@ -1922,7 +2113,6 @@ begin
 
                         until ch4=chr(27);
                 end;
-
                 if (ch='d') and (checkfile('save.txt')=true) then
                    cleargame;
                 if (ch='3') and (checkfile('save.txt')=true) then break;
@@ -1930,32 +2120,32 @@ begin
                 begin
                       menu2;
                       repeat
-                            if y1<11 then
-                                gotoxy((s-17) div 2-2,y1)
+                            if yy1<11 then
+                                gotoxy((s-17) div 2-2,yy1)
                             else
-                                gotoxy((s-17) div 2-2,y1+1);
+                                gotoxy((s-17) div 2-2,yy1+1);
                             write('->');
                             repeat
                             ch2:=readkey;
                             until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5') or
                             (ch2='6') or (ch2=chr(27)) or (ch2=#72) or (ch2=#80) or (ch2=#13);
-                            if (ch2=#72) and (y1>4) then
+                            if (ch2=#72) and (yy1>4) then
                             begin
-                                 if y1<11 then
-                                     gotoxy((s-17) div 2-2,y1)
+                                 if yy1<11 then
+                                     gotoxy((s-17) div 2-2,yy1)
                                  else
-                                     gotoxy((s-17) div 2-2,y1+1);
+                                     gotoxy((s-17) div 2-2,yy1+1);
                                  write('  ');
-                                 y1:=y1-1;
+                                 yy1:=yy1-1;
                             end;
-                            if (ch2=#80) and (y1<11) then
+                            if (ch2=#80) and (yy1<11) then
                             begin
-                                 if y1<11 then
-                                     gotoxy((s-17) div 2-2,y1)
+                                 if yy1<11 then
+                                     gotoxy((s-17) div 2-2,yy1)
                                  else
-                                     gotoxy((s-17) div 2-2,y1+1);
+                                     gotoxy((s-17) div 2-2,yy1+1);
                                  write('  ');
-                                 y1:=y1+1;
+                                 yy1:=yy1+1;
                             end;
                       until (ch2='0') or (ch2='1') or (ch2='2') or (ch2='3') or (ch2='4') or (ch2='5')
                       or (ch2='6') or (ch2=chr(27)) or (ch2=#13);
@@ -1967,18 +2157,18 @@ begin
                       end;
                       if ch2=#13 then
                       begin
-                           if (y1>4) and (y1<11) then
+                           if (yy1>4) and (yy1<11) then
                            begin
-                                diff:=pow2(y1+4);
+                                diff:=pow2(yy1+4);
                                 str(log2(diff)-8,s1);
                                 ch2:=s1[1];
                            end;
-                           if y1=4 then
+                           if yy1=4 then
                            begin
                                 diff:=1;
                                 ch2:='0';
                            end;
-                           if y1=11 then
+                           if yy1=11 then
                            begin
                                 str(log2(diff)-8,s1);
                                 ch2:=s1[1];
@@ -2026,15 +2216,15 @@ begin
                         end;
                 end;
            until (ch='1') or (ch='7') or (ch=chr(27));
-           if ch='3' then
-           begin
-                load;
-                loaded:=true;
-                val(ch2,c1,code);
-                if c1>0 then diff:=pow2(c1+8);
-                if c1=0 then
+           if (ch='3') and (checkfile('save.txt')=true) then
+                begin
+                     load;
+                     loaded:=true;
+                     val(ch2,c1,code);
+                     if c1>0 then diff:=pow2(c1+8);
+                     if c1=0 then
                         diff:=1;
-           end;
+                end;
            if loaded=false then
               begin
                 if easy=1 then cs:=4 else cs:=3;
@@ -2060,8 +2250,7 @@ begin
                         a[i,j]:=0;
                         d[i,j]:=0;
                     end;
-                start(a);
-                start(d);
+                start;start1;
            end;
            if (ch='1') or (ch='3') then
            begin
@@ -2072,7 +2261,7 @@ begin
                     repeat
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27));
-                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
+                    if (count>0) and (ch=re) and (moved=true) then rewind;
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2080,13 +2269,13 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup(a, c);
-                         move(ch, a);
+                         backup;
+                         move(ch);
                          if spunout<>1 then
-                            clear(ch, a)
+                            clear(ch)
                          else
                              for i:=1 to 11 do
-                                 clear(ch, a);
+                                 clear(ch);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2097,9 +2286,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn(a)
+                                     spawn
                                   else
-                                      spawnhardrock(a);
+                                      spawnhardrock;
                               count:=count+1;
                          end;
                     end;
@@ -2123,7 +2312,7 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
+                    if (lose(a,cs)=true) and (nofail=1) then continue;
               until (win(a,diff,cs)=true) or (lose(a,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
                  writef;
@@ -2168,8 +2357,8 @@ begin
                           ch:=readkey;
                     until (ch=up) or (ch=down) or (ch=left) or (ch=right) or (ch=re) or (ch=chr(27))
                     or (ch=up1) or (ch=down1) or (ch=left1) or (ch=right1) or (ch=re1);
-                    if (count>0) and (ch=re) and (moved=true) then rewind(a, c);
-                    if (count1>0) and (ch=re1) and (moved1=true) then rewind(d, e);
+                    if (count>0) and (ch=re) and (moved=true) then rewind;
+                    if (count1>0) and (ch=re1) and (moved1=true) then rewind1;
                     if (ch=up) or (ch=down) or (ch=left) or (ch=right) then
                     begin
                          if (ch=left) and (y>1) then y:=y-1;
@@ -2177,13 +2366,13 @@ begin
                          if (ch=up) and (x>1) then x:=x-1;
                          if (ch=down) and (x<cs-1) then x:=x+1;
                          moved:=true;
-                         backup(a, c);
-                         move(ch, a);
+                         backup;
+                         move(ch);
                          if spunout<>1 then
-                            clear(ch, a)
+                            clear(ch)
                          else
                              for i:=1 to 11 do
-                                 clear(ch, a);
+                                 clear(ch);
                          if difference(a,c,cs)=true then
                          begin
                               if soun=1 then
@@ -2194,9 +2383,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn(a)
+                                     spawn
                                   else
-                                      spawnhardrock(a);
+                                      spawnhardrock;
                               count:=count+1;
                          end;
                     end;
@@ -2207,13 +2396,13 @@ begin
                          if (ch=up1) and (x1>1) then x1:=x1-1;
                          if (ch=down1) and (x1<cs-1) then x1:=x1+1;
                          moved1:=true;
-                         backup(d, e);
-                         move(ch, d);
+                         backup1;
+                         move1(ch);
                          if spunout<>1 then
-                            clear(ch, d)
+                            clear1(ch)
                          else
                              for i:=1 to 11 do
-                                 clear(ch, d);
+                                 clear1(ch);
                          if difference(d,e,cs)=true then
                          begin
                               if soun=1 then
@@ -2224,9 +2413,9 @@ begin
                               end;
                               for i:=1 to diff1+1 do
                                   if hardrock=-1 then
-                                     spawn(d)
+                                     spawn1
                                   else
-                                      spawnhardrock(d);
+                                      spawnhardrock1;
                               count1:=count1+1;
                          end;
                     end;
@@ -2250,8 +2439,8 @@ begin
                          if ch='n' then
                             if gfx<>1 then title else titlegfx;
                     end;
-                    if (lose(a,cs)=true) and (nofail=1) then conti(a);
-                    if (lose(d,cs)=true) and (nofail=1) then conti(d);
+                    if (lose(a,cs)=true) and (nofail=1) then continue;
+                    if (lose(d,cs)=true) and (nofail=1) then continue1;
               until (win(a,diff,cs)=true) or (lose(a,cs)=true)
               or (win(d,diff,cs)=true) or (lose(d,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
