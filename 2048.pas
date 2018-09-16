@@ -13,16 +13,23 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *)
-uses crt;
+uses crt,dos;
 type mang=array[0..10,0..10] of longint;
 var a,d,c,e:mang;
-        i,j,code,c1,count,count1,diff:word;
+        i,j,code,c1,count,count1,diff,date,hour,min,sec,hsec:word;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re,re1,up1,down1,left1,right1:char;
-        fmove,fnum:longint;
+        fmove,fnum,starttime,finish,total:longint;
         moved,moved1,loaded,wide:boolean;
         hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun,nofail1:shortint;
         cs,s,x,y,x1,y1,xx,yy,xx1,yy1:byte;
         username,s1:string;
+function time:longint;
+var y,m,d,w,h,m1,s,hs:word;
+begin
+     getdate(y,m,d,w);
+     gettime(h,m1,s,hs);
+     time:=d*8640000+h*360000+m1*6000+s*100+hs;
+end;
 procedure losingtune;
 begin
      delay(150);
@@ -1426,6 +1433,8 @@ begin
           write(f,ch2,' ',diff1,' ',count,' ',hidden,' ',hardrock,' ',spunout,' ',nofail,' ',flashlight);
           writeln(f);
           write(f,efl,' ',x,' ',y);
+          writeln(f);
+          write(f,starttime);
           close(f);
      end;
 end;
@@ -1450,12 +1459,14 @@ begin
         end;
         readln(f,ch2,diff1,count,hidden,hardrock,spunout,nofail,flashlight);
         readln(f,efl,x,y);
+        readln(f,starttime);
         if hidden=0 then hidden:=-1;
         if hardrock=0 then hardrock:=-1;
         if spunout=0 then spunout:=-1;
         if nofail=0 then nofail:=-1;
         if flashlight=0 then flashlight:=-1;
         if efl=0 then efl:=-1;
+        if starttime=0 then starttime:=time;
         close(f);
 end;
 procedure cleargame;   {deletes save file}
@@ -1471,7 +1482,7 @@ begin
      for k:=1 to s-1 do
          write('-');
      writeln;
-     calibrate('2048 Remastered',s);
+     calibrate('2049',s);
      for k:=1 to s-1 do
          write('-');
      writeln;
@@ -1494,7 +1505,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.2.4',s-20);
+     calibrate('Update 5.3',s-22);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1739,6 +1750,20 @@ begin
                write(chr(205));
            write(chr(188));
         end;
+end;
+procedure convert;
+begin
+     total:=abs(finish-starttime);
+     writeln(total);
+     date:=total div 8640000;
+     total:=total mod 8640000;
+     hour:=total div 360000;
+     total:=total mod 360000;
+     min:=total div 6000;
+     total:=total mod 6000;
+     sec:=total div 100;
+     total:=total mod 100;
+     hsec:=total;
 end;
 begin
      s:=80;
@@ -2229,6 +2254,7 @@ begin
               begin
                 if easy=1 then cs:=4 else cs:=3;
                 x:=1;y:=1;
+                starttime:=time;
               end;
            if ch=chr(27) then
            begin
@@ -2254,6 +2280,7 @@ begin
            end;
            if (ch='1') or (ch='3') then
            begin
+
               if gfx<>1 then title else titlegfx;
               repeat
                     gotoxy(1,5);
@@ -2316,6 +2343,8 @@ begin
               until (win(a,diff,cs)=true) or (lose(a,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
                  writef;
+              finish:=time;
+              convert;
               repeat
                     if win(a,diff,cs)=true then
                     begin
@@ -2335,6 +2364,7 @@ begin
                          writeln('YOU LOST');
                          if soun=1 then losingtune;
                     end;
+                    writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
                     if (ch<>'y') and (ch<>'s') then
@@ -2349,6 +2379,7 @@ begin
            if ch='7' then
            begin
               x1:=1;x:=1;y1:=1;y:=1;
+              starttime:=time;
               if gfx<>1 then title else titlegfx;
               repeat
                     gotoxy(1,5);
@@ -2445,6 +2476,8 @@ begin
               or (win(d,diff,cs)=true) or (lose(d,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
                  writef;
+              finish:=time;
+              convert;
               repeat
                     if (win(a,diff,cs)=true) or (lose(d,cs)=true) then
                     begin
@@ -2464,6 +2497,7 @@ begin
                          writeln('PLAYER 2 WON');
                          if soun=1 then winningtune;
                     end;
+                    writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
                     if (ch<>'y') and (ch<>'s') then
