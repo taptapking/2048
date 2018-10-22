@@ -20,7 +20,7 @@ var a,d,c,e:mang;
         ch,ch1,ch2,ch3,ch4,ch5,up,down,left,right,re,re1,up1,down1,left1,right1:char;
         fmove,fnum,starttime,finish,total:longint;
         moved,moved1,loaded,wide:boolean;
-        hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun,nofail1:shortint;
+        hidden,bg,txt,hardrock,spunout,nofail,easy,flashlight,color,efl,gfx,diff1,difftotal,soun,nofail1,readonly:shortint;
         cs,s,x,y,x1,y1,xx,yy,xx1,yy1:byte;
         username,s1:string;
 function time:longint;
@@ -327,6 +327,24 @@ begin
      else chk:=false;
      if chk=true then close(f);
      checkfile:=chk;
+end;
+function writetest:boolean;{verify if the disk is writable}
+var f:text;
+    chk:boolean;
+begin
+     assign(f,'test.txt');
+{$I-}
+     rewrite(f);
+{$I+}
+     if IOResult=0 then chk:=true
+     else chk:=false;
+     if chk=true then
+     begin
+          close(f);
+          assign(f,'test.txt');
+          erase(f);
+     end;
+     writetest:=chk;
 end;
 procedure rewind;{rewind a move on P1 Board}
 var i,j:byte;
@@ -757,16 +775,16 @@ begin
      writeln('Moves:',count);{prints borders between lines}
 end;
 procedure printfmulti; {prints health bar and board in multiplayer mode}
-var i,j,k,k1:byte;
+var i,j,k,k1,healthbar:byte;
 begin
-     k1:=0;
+     k1:=0;healthbar:=0;
      if ((nofail<>1) and (s<120) and (cs<4)) or ((nofail<>1) and (s>=120)) then
      begin
+        healthbar:=1;
         for i:=1 to sqr(cs+1) do
             if gfx<>1 then write('--') else write(chr(196),chr(196));
         if gfx<>1 then write(':') else write(chr(191));
-        for i:=1 to s-(4*(sqr(cs+1)+1))+1 do
-            write(' ');
+        gotoxy(sqr(cs+1)*2+s-(4*(sqr(cs+1)+1))+3,5);
         if gfx<>1 then write(':') else write(chr(218));
         for i:=1 to sqr(cs+1) do
             if gfx<>1 then write('--') else write(chr(196),chr(196));
@@ -794,8 +812,7 @@ begin
         if lose(a,cs)=false then
            if gfx<>1 then write('|') else write(chr(179))
            else if gfx<>1 then write('  |') else write('  ',chr(179));
-        for i:=2 to s-((sqr(cs+1)+1)*4)+2 do
-            write(' ');
+        gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,6);
         if lose(d,cs)=false then
            if gfx<>1 then write('|') else write(chr(179))
            else if gfx<>1 then write('|  ') else write(chr(179),'  ');
@@ -824,15 +841,13 @@ begin
         for i:=1 to sqr(cs+1)-1 do
             if gfx<>1 then write('__') else write(chr(196),chr(196));
         if gfx<>1 then write('_/') else write(chr(196),chr(196),chr(217));
-        for i:=1 to s-((sqr(cs+1)+1)*4)+1 do
-            write(' ');
-        if gfx<>1 then write('  \_') else write(chr(192),chr(196),chr(196));
+        gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,7);
+        if gfx<>1 then write(' \_') else write(chr(192),chr(196),chr(196));
         for i:=1 to sqr(cs+1)-1 do
             if gfx<>1 then write('__') else write(chr(196),chr(196));
         writeln;
      end;
-     for k:=2 to (s-12*(cs+1)) div 3 do
-         write(' ');
+     gotoxy((s-12*(cs+1)) div 3,5+healthbar*3);
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
@@ -844,8 +859,7 @@ begin
      writeln;
      for i:=0 to cs do
      begin
-          for k:=2 to (s-12*(cs+1)) div 3 do
-              write(' ');
+          gotoxy((s-12*(cs+1)) div 3,6+i*2+healthbar*3);
           if gfx<>1 then write('|') else write(chr(179));
           for j:=0 to cs do
           begin
@@ -968,8 +982,7 @@ begin
                     end;
                     textbackground(bg);
           end;
-          for k:=1 to (s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2 do
-              write(' ');
+          gotoxy((s-12*(cs+1)) div 3+6*(cs+1)+(s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1,6+i*2+healthbar*3);
           if gfx<>1 then write('|') else write(chr(179));
           for j:=0 to cs do
           begin
@@ -1094,8 +1107,7 @@ begin
           writeln;
           if i<=cs then
           begin
-               for k:=2 to (s-12*(cs+1)) div 3 do
-                   write(' ');
+               gotoxy((s-12*(cs+1)) div 3,7+healthbar*3+2*i);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
@@ -1340,28 +1352,31 @@ end;
 procedure writef1;    {writes configuration to a file}
 var f:text;
 begin
-     assign(f,'record.txt');
-     rewrite(f);
-     writeln(f,fnum,' ',fmove);
-     writeln(f,username);
-     writeln(f,txt);
-     writeln(f,bg);
-     writeln(f,color);
-     writeln(f,up);
-     writeln(f,down);
-     writeln(f,left);
-     writeln(f,right);
-     writeln(f,re);
-     writeln(f,efl);
-     writeln(f,soun);
-     writeln(f,gfx);
-     writeln(f,s);
-     writeln(f,up1);
-     writeln(f,down1);
-     writeln(f,left1);
-     writeln(f,right1);
-     writeln(f,re1);
-     close(f);
+     if readonly<>1 then
+     begin
+        assign(f,'record.txt');
+        rewrite(f);
+        writeln(f,fnum,' ',fmove);
+        writeln(f,username);
+        writeln(f,txt);
+        writeln(f,bg);
+        writeln(f,color);
+        writeln(f,up);
+        writeln(f,down);
+        writeln(f,left);
+        writeln(f,right);
+        writeln(f,re);
+        writeln(f,efl);
+        writeln(f,soun);
+        writeln(f,gfx);
+        writeln(f,s);
+        writeln(f,up1);
+        writeln(f,down1);
+        writeln(f,left1);
+        writeln(f,right1);
+        writeln(f,re1);
+        close(f);
+     end;
 end;
 function maxnum(a:mang;cs:byte):longint; {determines what number is the largest on the board}
 var i,j,m:longint;
@@ -1375,28 +1390,31 @@ end;
 procedure writef; {writes configuration to a file}
 var f:text;
 begin
-     assign(f,'record.txt');
-     rewrite(f);
-     writeln(f,point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1),' ',maxnum(a,cs));
-     writeln(f,username);
-     writeln(f,txt);
-     writeln(f,bg);
-     writeln(f,color);
-     writeln(f,up);
-     writeln(f,down);
-     writeln(f,left);
-     writeln(f,right);
-     writeln(f,re);
-     writeln(f,efl);
-     writeln(f,soun);
-     writeln(f,gfx);
-     writeln(f,s);
-     writeln(f,up1);
-     writeln(f,down1);
-     writeln(f,left1);
-     writeln(f,right1);
-     writeln(f,re1);
-     close(f);
+     if readonly<>1 then
+     begin
+        assign(f,'record.txt');
+        rewrite(f);
+        writeln(f,fnum,' ',fmove);
+        writeln(f,username);
+        writeln(f,txt);
+        writeln(f,bg);
+        writeln(f,color);
+        writeln(f,up);
+        writeln(f,down);
+        writeln(f,left);
+        writeln(f,right);
+        writeln(f,re);
+        writeln(f,efl);
+        writeln(f,soun);
+        writeln(f,gfx);
+        writeln(f,s);
+        writeln(f,up1);
+        writeln(f,down1);
+        writeln(f,left1);
+        writeln(f,right1);
+        writeln(f,re1);
+        close(f);
+     end;
 end;
 procedure save;  {saves game to a file}
 var i,j:byte;
@@ -1500,12 +1518,12 @@ begin
         write(' ');
      write('Hit 6 to change difficulty ');writeln('(',chr(ord(ch3)+1),'x)');
      if s>=80 then calibrate('Hit 7 to start a multiplayer game',s+2) else writeln;
-     if checkfile('save.txt')=true then
+     if (checkfile('save.txt')=true) and (readonly<>1) then
         calibrate('Hit d to clear your game',s-8)
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.3',s-22);
+     calibrate('Update 5.4',s-22);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
@@ -1660,6 +1678,8 @@ begin
         else calibrate('Hit 8 to turn on sound',s-15);
         if gfx=1 then calibrate('Hit 9 to turn on low settings',s-8)
         else calibrate('Hit 9 to turn on high settings',s-8);
+        if readonly=1 then calibrate('Hit 0 to turn off read-only mode',s-6)
+        else calibrate('Hit 0 to turn on read-only mode',s-7);
         writeln;
         calibrate('Hit esc to exit',s-22);
         if (s>=80) and (gfx<>-1) then
@@ -1669,7 +1689,7 @@ begin
            for i:=1 to 38 do
                write(chr(205));
            write(chr(187));
-           for i:=1 to 13 do
+           for i:=1 to 14 do
            begin
                 gotoxy((s-34) div 2-3,i+1);
                 write(chr(186));
@@ -1681,7 +1701,7 @@ begin
            for i:=1 to 38 do
                write(chr(205));
            write(chr(185));
-           gotoxy((s-34) div 2-3,15);
+           gotoxy((s-34) div 2-3,16);
            write(chr(200));
            for i:=1 to 38 do
                write(chr(205));
@@ -1754,7 +1774,6 @@ end;
 procedure convert;
 begin
      total:=abs(finish-starttime);
-     writeln(total);
      date:=total div 8640000;
      total:=total mod 8640000;
      hour:=total div 360000;
@@ -1769,12 +1788,14 @@ begin
      s:=80;
      hidden:=-1;hardrock:=-1;spunout:=-1;nofail:=-1;flashlight:=-1;cs:=3;easy:=-1;wide:=false;
      ch3:='1';ch2:='1';diff:=512;up:='H';down:='P';left:='K';right:='M';re:='r';
-     bg:=0;txt:=7;color:=-1;efl:=-1;soun:=-1;gfx:=-1;
+     bg:=0;txt:=7;color:=-1;efl:=-1;soun:=-1;gfx:=-1;readonly:=-1;
      up1:='w';down1:='s';left1:='a';right1:='d';re1:='z';
+     if checkfile('record.txt')=true then readf;
+     if writetest=false then readonly:=1;
+     {if s=40 then textmode(c40) else textmode(c80);}
+     if s>=120 then wide:=true else wide:=false;
      repeat
-           count:=0;count1:=0;if checkfile('record.txt')=true then readf;moved:=false;loaded:=false;
-           {if s=40 then textmode(c40) else textmode(c80);}
-           if s>=120 then wide:=true else wide:=false;
+           count:=0;count1:=0;moved:=false;loaded:=false;
            textcolor(txt);
            textbackground(bg);
            xx:=4;yy:=4;xx1:=4;yy1:=4;j:=4;
@@ -1815,7 +1836,7 @@ begin
                         end;
                         menu4;
                         repeat
-                              if yy<13 then
+                              if yy<14 then
                                  gotoxy((s-34) div 2-2,yy)
                               else
                                   gotoxy((s-34) div 2-2,yy+1);
@@ -1825,11 +1846,11 @@ begin
                               repeat
                                     ch4:=readkey;
                               until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
-                              or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3')
-                              or ((ch4=#72) and (yy>4)) or ((ch4=#80) and (yy<13)) or (ch4=#13);
+                              or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='0') or (ch4='3')
+                              or ((ch4=#72) and (yy>4)) or ((ch4=#80) and (yy<14)) or (ch4=#13);
                         if ch4=#72 then
                         begin
-                             if yy<13 then
+                             if yy<14 then
                                  gotoxy((s-34) div 2-2,yy)
                              else
                                  gotoxy((s-34) div 2-2,yy+1);
@@ -1838,7 +1859,7 @@ begin
                         end;
                         if ch4=#80 then
                         begin
-                             if yy<13 then
+                             if yy<14 then
                                 gotoxy((s-34) div 2-2,yy)
                              else
                                  gotoxy((s-34) div 2-2,yy+1);
@@ -1846,12 +1867,13 @@ begin
                              yy:=yy+1;
                         end;
                         until (ch4='8') or (ch4='1') or (ch4='2') or (ch4='7') or (ch4=chr(27))
-                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='3') or (ch4=#13);
+                        or (ch4='4') or (ch4='5') or (ch4='6') or (ch4='9') or (ch4='0') or (ch4='3') or (ch4=#13);
                         if ch4=#13 then
                         begin
                              str(yy-3,s1);
                              ch4:=s1[1];
-                             if s1='10' then ch4:=#27;
+                             if s1='10' then ch4:='0';
+                             if s1='11' then ch4:=#27;
                         end;
                         if ch4='1' then
                         begin
@@ -1916,6 +1938,10 @@ begin
                         begin
                                 gfx:=gfx*-1;
                                 writef1;
+                        end;
+                        if ch4='0' then
+                        begin
+                                readonly:=readonly*-1;
                         end;
                         if ch4='4' then
                         begin
@@ -2138,7 +2164,7 @@ begin
 
                         until ch4=chr(27);
                 end;
-                if (ch='d') and (checkfile('save.txt')=true) then
+                if (ch='d') and (checkfile('save.txt')=true) and (readonly<>1) then
                    cleargame;
                 if (ch='3') and (checkfile('save.txt')=true) then break;
                 if ch='5' then
@@ -2325,11 +2351,14 @@ begin
                          writeln('PAUSED');
                          writeln('Press y to return to menu');
                          writeln('Press n to continue');
-                         writeln('Press s to save your game and return to menu');
-                         writeln('Press q to save and continue');
+                         if readonly<>1 then
+                         begin
+                                writeln('Press s to save your game and return to menu');
+                                writeln('Press q to save and continue');
+                         end;
                          repeat
                                ch:=readkey;
-                         until (ch='y') or (ch='n') or (ch='s') or (ch='q');
+                         until (ch='y') or (ch='n') or (((ch='s') or (ch='q')) and (readonly<>1)) ;
                          if (ch='y') or (ch='s') then break;
                          if ch='q' then
                          begin
@@ -2342,7 +2371,11 @@ begin
                     if (lose(a,cs)=true) and (nofail=1) then continue;
               until (win(a,diff,cs)=true) or (lose(a,cs)=true);
               if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
-                 writef;
+              begin
+                   fnum:=point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1);
+                   fmove:=maxnum(a,cs);
+                   writef;
+              end;
               finish:=time;
               convert;
               repeat
@@ -2354,6 +2387,7 @@ begin
                          printf;
                          writeln('YOU WON');
                          if soun=1 then winningtune;
+                         writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     end;
                     if lose(a,cs)=true then
                     begin
@@ -2363,8 +2397,8 @@ begin
                          printf;
                          writeln('YOU LOST');
                          if soun=1 then losingtune;
+                         writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     end;
-                    writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
                     if (ch<>'y') and (ch<>'s') then
@@ -2474,8 +2508,18 @@ begin
                     if (lose(d,cs)=true) and (nofail=1) then continue1;
               until (win(a,diff,cs)=true) or (lose(a,cs)=true)
               or (win(d,diff,cs)=true) or (lose(d,cs)=true);
-              if (point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum) then
-                 writef;
+              if point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum then
+              begin
+                   fnum:=point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1);
+                   fmove:=maxnum(a,cs);
+                   writef;
+              end;
+              if point(d,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)>fnum then
+              begin
+                   fnum:=point(d,cs,hidden,hardrock,spunout,nofail,flashlight,diff1);
+                   fmove:=maxnum(d,cs);
+                   writef;
+              end;
               finish:=time;
               convert;
               repeat
@@ -2487,6 +2531,7 @@ begin
                          printfmulti;
                          writeln('PLAYER 1 WON');
                          if soun=1 then winningtune;
+                         writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     end;
                     if (win(d,diff,cs)=true) or (lose(a,cs)=true) then
                     begin
@@ -2496,8 +2541,8 @@ begin
                          printfmulti;
                          writeln('PLAYER 2 WON');
                          if soun=1 then winningtune;
+                         writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     end;
-                    writeln(date,' days ',hour,':',min,':',sec,':',hsec);
                     if ch='s' then save;
                     if (ch='y') or (ch='s') then ch1:='y';
                     if (ch<>'y') and (ch<>'s') then
