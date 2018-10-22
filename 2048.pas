@@ -851,8 +851,7 @@ begin
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
-     for i:=2 to (s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1 do
-            write(' ');
+     gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+6*(cs+1)+(s-12*(cs+1)) div 3+1,5+healthbar*3);
      if gfx<>1 then write('|') else write(chr(218));
      for k:=1 to cs+1 do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
@@ -1112,8 +1111,7 @@ begin
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
                if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
-               for k:=2 to (s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1 do
-                   write(' ');
+               gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1+6*(cs+1)+(s-12*(cs+1)) div 3,7+healthbar*3+2*i);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
@@ -1666,9 +1664,9 @@ begin
         writeln;
         calibrate('Hit 1 to use dark theme',s-14);
         calibrate('Hit 2 to use light theme',s-13);
-        {calibrate('Hit 3 to change between 40/80 columns',s);}
+        calibrate('Hit 3 to change between 40/80 columns',s);
         calibrate('Hit 3 to trigger widescreen mode',s-5);
-        calibrate('Hit 4 to change username',s-13);
+        {calibrate('Hit 4 to change username',s-13);}
         calibrate('Hit 5 to change keyboard bindings',s-4);
         if color=-1 then calibrate('Hit 6 to turn on color',s-15)
         else calibrate('Hit 6 to turn off color',s-14);
