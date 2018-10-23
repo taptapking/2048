@@ -545,8 +545,8 @@ begin
      if ((nofail<>1) and (s<80) and (cs<4)) or ((nofail<>1) and (s>=80)) then
      begin
         for i:=1 to sqr(cs+1) do
-            if gfx<>1 then write('--') else write(chr(196),chr(196));
-        if gfx<>1 then write(':') else write(chr(191));
+            if gfx<>1 then write('--') else write(chr(205),chr(205));
+        if gfx<>1 then write(':') else write(chr(187));
         writeln;
         if color<>-1 then
         begin
@@ -569,13 +569,13 @@ begin
         for i:=1 to sqr(cs+1)-health(a,cs) do
             write('  ');
         if lose(a,cs)=false then
-           if gfx<>1 then write('|') else write(chr(179))
-           else if gfx<>1 then write('  |') else write('  ',chr(179));
+           if gfx<>1 then write('|') else write(chr(186))
+           else if gfx<>1 then write('  |') else write('  ',chr(186));
         gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) ,6);
         writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
         for i:=1 to sqr(cs+1)-1 do
-            if gfx<>1 then write('__') else write(chr(196),chr(196));
-        if gfx<>1 then write('_/') else write(chr(196),chr(196),chr(217));
+            if gfx<>1 then write('__') else write(chr(205),chr(205));
+        if gfx<>1 then write('_/') else write(chr(205),chr(205),chr(188));
         writeln;
      end {renders health bar when not using NF}
      else
@@ -586,8 +586,9 @@ begin
      if (nofail=1) or ((s<80) and (cs>3)) then nofail1:=1 else nofail1:=-1;
      gotoxy((s-6*(cs+1)) div 2,7-nofail1);
      if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs+1 do
+     for k:=1 to cs do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
+     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
      {prints the top of the board}
      if cs>=4 then k1:=k1+3;
      if nofail=1 then k1:=k1+3;
@@ -763,13 +764,20 @@ begin
                     textbackground(bg);
           end;
           writeln;
-          if i<=cs then
+          gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+2);
+          if i<cs then
           begin
-               gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+2);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
                if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
+          end
+          else
+          begin
+               if gfx<>1 then write('|') else write(chr(192));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
           end;
      end;
      writeln('Moves:',count);{prints borders between lines}
@@ -782,12 +790,12 @@ begin
      begin
         healthbar:=1;
         for i:=1 to sqr(cs+1) do
-            if gfx<>1 then write('--') else write(chr(196),chr(196));
-        if gfx<>1 then write(':') else write(chr(191));
+            if gfx<>1 then write('--') else write(chr(205),chr(205));
+        if gfx<>1 then write(':') else write(chr(187));
         gotoxy(sqr(cs+1)*2+s-(4*(sqr(cs+1)+1))+3,5);
-        if gfx<>1 then write(':') else write(chr(218));
+        if gfx<>1 then write(':') else write(chr(201));
         for i:=1 to sqr(cs+1) do
-            if gfx<>1 then write('--') else write(chr(196),chr(196));
+            if gfx<>1 then write('--') else write(chr(205),chr(205));
         writeln;
         if color<>-1 then
         begin
@@ -810,12 +818,12 @@ begin
         for i:=1 to sqr(cs+1)-health(a,cs) do
             write('  ');
         if lose(a,cs)=false then
-           if gfx<>1 then write('|') else write(chr(179))
-           else if gfx<>1 then write('  |') else write('  ',chr(179));
+           if gfx<>1 then write('|') else write(chr(186))
+           else if gfx<>1 then write('  |') else write('  ',chr(186));
         gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,6);
         if lose(d,cs)=false then
-           if gfx<>1 then write('|') else write(chr(179))
-           else if gfx<>1 then write('|  ') else write(chr(179),'  ');
+           if gfx<>1 then write('|') else write(chr(186))
+           else if gfx<>1 then write('|  ') else write(chr(186),'  ');
         for i:=1 to sqr(cs+1)-health(d,cs) do
             write('  ');
         if color<>-1 then
@@ -839,23 +847,24 @@ begin
         writeln;
         {writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));}
         for i:=1 to sqr(cs+1)-1 do
-            if gfx<>1 then write('__') else write(chr(196),chr(196));
-        if gfx<>1 then write('_/') else write(chr(196),chr(196),chr(217));
+            if gfx<>1 then write('__') else write(chr(205),chr(205));
+        if gfx<>1 then write('_/') else write(chr(205),chr(205),chr(188));
         gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,7);
-        if gfx<>1 then write(' \_') else write(chr(192),chr(196),chr(196));
+        if gfx<>1 then write(' \_') else write(chr(200),chr(205),chr(205));
         for i:=1 to sqr(cs+1)-1 do
-            if gfx<>1 then write('__') else write(chr(196),chr(196));
+            if gfx<>1 then write('__') else write(chr(205),chr(205));
         writeln;
      end;
      gotoxy((s-12*(cs+1)) div 3,5+healthbar*3);
      if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs+1 do
+     for k:=1 to cs do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
+     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
      gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+6*(cs+1)+(s-12*(cs+1)) div 3+1,5+healthbar*3);
      if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs+1 do
+     for k:=1 to cs do
          if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
-     writeln;
+     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
      for i:=0 to cs do
      begin
           gotoxy((s-12*(cs+1)) div 3,6+i*2+healthbar*3);
@@ -1104,18 +1113,35 @@ begin
                     textbackground(bg);
           end;
           writeln;
-          if i<=cs then
+          gotoxy((s-12*(cs+1)) div 3,7+healthbar*3+2*i);
+          if i<cs then
           begin
-               gotoxy((s-12*(cs+1)) div 3,7+healthbar*3+2*i);
-               if gfx<>1 then write('|') else write(chr(195));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
-               if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
-               gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1+6*(cs+1)+(s-12*(cs+1)) div 3,7+healthbar*3+2*i);
                if gfx<>1 then write('|') else write(chr(195));
                for k:=1 to cs do
                    if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
                if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
+          end
+          else
+          begin
+               if gfx<>1 then write('|') else write(chr(192));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
+          end;
+          gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1+6*(cs+1)+(s-12*(cs+1)) div 3,7+healthbar*3+2*i);
+          if i<cs then
+          begin
+               if gfx<>1 then write('|') else write(chr(195));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
+          end
+          else
+          begin
+               if gfx<>1 then write('|') else write(chr(192));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
           end;
      end;
      writeln('Moves P1:',count);
@@ -1664,9 +1690,9 @@ begin
         writeln;
         calibrate('Hit 1 to use dark theme',s-14);
         calibrate('Hit 2 to use light theme',s-13);
-        calibrate('Hit 3 to change between 40/80 columns',s);
+        {calibrate('Hit 3 to change between 40/80 columns',s);}
         calibrate('Hit 3 to trigger widescreen mode',s-5);
-        {calibrate('Hit 4 to change username',s-13);}
+        calibrate('Hit 4 to change username',s-13);
         calibrate('Hit 5 to change keyboard bindings',s-4);
         if color=-1 then calibrate('Hit 6 to turn on color',s-15)
         else calibrate('Hit 6 to turn off color',s-14);
