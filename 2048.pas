@@ -538,46 +538,241 @@ begin
      if count>sqr(cs+1) then count:=sqr(cs+1);
      health:=count;
 end;
-procedure printf;{prints a board and health bar in singleplayer mode}
-var i,j,k,k1:byte;
+procedure board(a1:mang;x,y:byte);
+var i,j,k:byte;
 begin
-     k1:=0;
+     gotoxy(x,y-1);
+     if gfx<>1 then write('|') else write(chr(218));
+     for k:=1 to cs do
+         if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
+     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
+     for i:=0 to cs do
+     begin
+          gotoxy(x,y+2*i);
+          if gfx<>1 then write('|') else write(chr(179));
+          for j:=0 to cs do
+          begin
+                   if (a1[i,j]<>0) and (flashlight<>1) then
+                   {print numbers when flashlight mod is disabled and the number inside is not 0}
+                   begin
+                        if color<>-1 then
+                        begin
+                                textbackground(round(log2(a1[i,j])));
+                                if (round(log2(a1[i,j]))=txt) or (round(log2(a1[i,j]))-8=txt) or (round(log2(a1[i,j]))+8=txt)
+                                then textbackground(round(log2(a1[i,j]))-1);
+                        end;{generate colors when color is enabled}
+                        if (a1[i,j]=16) and (hidden=1) then write('  ',a1[i,j],' ');
+                        if (a1[i,j]>16) and (hidden=1) then {prints numbers when hidden mod is enabled}
+                        begin
+                                textbackground(bg);
+                                write('  ','?','  ');
+                        end;
+                        if a1[i,j]<10 then
+                           write('  ',a1[i,j],'  ');
+                        if (a1[i,j]>9) and (a1[i,j]<100) and (hidden=-1) then
+                           write('  ',a1[i,j],' ');
+                        if (a1[i,j]>99) and (a1[i,j]<1000) and (hidden=-1) then
+                           write(' ',a1[i,j],' ');
+                        if (a1[i,j]>999) and (a1[i,j]<10000) and (hidden=-1) then
+                           write(' ',a1[i,j]);
+                        if (a1[i,j]>9999) and (a1[i,j]<100000) and (hidden=-1) then
+                           write(a1[i,j]);
+                        textbackground(bg);
+                        if gfx<>1 then write('|') else write(chr(179));
+                   end;
+                   if (a1[i,j]=0) and (flashlight<>1) then
+                   {print numbers when flashlight mod is disabled and the number inside is 0}
+                          if gfx<>1 then write('     |')
+                   else write('     ',chr(179));
+                   if (flashlight=1) and (efl=1) then
+                   begin{print numbers when flashlight mod and enhanced mode are enabled}
+                        if (x-1<=i) and (i<=x+1) and (y-1<=j) and (j<=y+1) then
+                        begin
+                                if a1[i,j]=0 then
+                                        if gfx<>1 then write('     |')  else write('     ',chr(179))
+                                else
+                                begin
+                                        if color<>-1 then
+                                        begin
+                                                textbackground(round(log2(a1[i,j])));
+                                                if (round(log2(a1[i,j]))+8=txt) or (round(log2(a1[i,j]))-8=txt)
+                                                or (round(log2(a1[i,j]))=txt)
+                                                then textbackground(round(log2(a1[i,j])-1));
+                                        end;{generate colors when color is enabled}
+                                        if (a1[i,j]=16) and (hidden=1) then write('  ',a1[i,j],' ');
+                                        if (a1[i,j]>16) and (hidden=1) then{print numbers when hidden mod is enabled}
+                                        begin
+                                                textbackground(bg);
+                                                write('  ','?','  ');
+                                        end;
+                                        if a1[i,j]<10 then
+                                                write('  ',a1[i,j],'  ');
+                                        if (a1[i,j]>9) and (a1[i,j]<100) and (hidden=-1) then
+                                                write('  ',a1[i,j],' ');
+                                        if (a1[i,j]>99) and (a1[i,j]<1000) and (hidden=-1) then
+                                                write(' ',a1[i,j],' ');
+                                        if (a1[i,j]>999) and (a1[i,j]<10000) and (hidden=-1) then
+                                                write(' ',a1[i,j]);
+                                        if (a1[i,j]>9999) and (a1[i,j]<100000) and (hidden=-1) then
+                                                write(a1[i,j]);
+                                        textbackground(bg);
+                                        if gfx<>1 then write('|') else write(chr(179));
+                                end;{prints numbers in the visible area}
+                        end
+                        else
+                        begin
+                                textbackground(txt);
+                                write('     ');
+                                textbackground(bg);
+                                if gfx<>1 then write('|') else write(chr(179));
+                        end;   {hides numbers not in the visible area}
+                    end;
+                    if (flashlight=1) and (efl=-1) then
+                    begin {print numbers when flashlight mod is enabled and enhanced mode is disabled}
+                        if ((health(a1,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a1,cs)<=2) and (i>=2) and (j<=cs-2)) then
+                        begin
+                             if a1[i,j]=0 then
+                             if gfx<>1 then write('     |') else write('     ',chr(179));
+                             if a1[i,j]<>0 then
+                             begin
+                                  if color<>-1 then
+                                  begin
+                                        textbackground(round(log2(a1[i,j])));
+                                        if (round(log2(a1[i,j]))+8=txt) or (round(log2(a1[i,j]))-8=txt)
+                                        or (round(log2(a1[i,j]))=txt)
+                                        then textbackground(round(log2(a1[i,j])-1));
+                                  end;{generate colors when color is enabled}
+                                  if (a1[i,j]=16) and (hidden=1) then write('  ',a1[i,j],' ');
+                                  if (a1[i,j]>16) and (hidden=1) then
+                                  begin
+                                        textbackground(bg);
+                                        write('  ','?','  ');
+                                  end;{print numbers when hidden is enabled}
+                                  if a1[i,j]<10 then
+                                     write('  ',a1[i,j],'  ');
+                                  if (a1[i,j]>9) and (a1[i,j]<100) and (hidden=-1) then
+                                     write('  ',a1[i,j],' ');
+                                  if (a1[i,j]>99) and (a1[i,j]<1000) and (hidden=-1) then
+                                     write(' ',a1[i,j],' ');
+                                  if (a1[i,j]>999) and (a1[i,j]<10000) and (hidden=-1) then
+                                     write(' ',a1[i,j]);
+                                  if (a1[i,j]>9999) and (a1[i,j]<100000) and (hidden=-1) then
+                                     write(a1[i,j]);
+                                  textbackground(bg);
+                                  if gfx<>1 then write('|') else write(chr(179));
+                             end; {prints numbers in the visible area}
+                        end
+                        else
+                        begin
+                                textbackground(txt);
+                                write('     ');
+                                textbackground(bg);
+                                if gfx<>1 then write('|') else write(chr(179));
+                        end; {hides numbers not in the visible area}
+                    end;
+                    textbackground(bg);
+          end;
+          writeln;
+          gotoxy(x,y+1+2*i);
+          if i<cs then
+          begin
+               if gfx<>1 then write('|') else write(chr(195));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
+          end
+          else
+          begin
+               if gfx<>1 then write('|') else write(chr(192));
+               for k:=1 to cs do
+                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
+               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
+          end;
+     end;
+end;
+procedure hp1(a1:mang);
+begin
      if ((nofail<>1) and (s<80) and (cs<4)) or ((nofail<>1) and (s>=80)) then
      begin
+        gotoxy(1,5);
         for i:=1 to sqr(cs+1) do
             if gfx<>1 then write('--') else write(chr(205),chr(205));
         if gfx<>1 then write(':') else write(chr(187));
-        writeln;
+        gotoxy(1,6);
         if color<>-1 then
         begin
-                if (health(a,cs)>sqr(cs-1)*2) and (health(a,cs)<=sqr(cs-1)*4) then textbackground(2);
-                if (health(a,cs)>sqr(cs-1)) and (health(a,cs)<=sqr(cs-1)*2) then textbackground(3);
-                if (health(a,cs)<=sqr(cs-1)) then textbackground(4);
-                if lose(a,cs)=false then
-                        for i:=1 to health(a,cs) do
+                if (health(a1,cs)>sqr(cs-1)*2) and (health(a1,cs)<=sqr(cs-1)*4) then textbackground(2);
+                if (health(a1,cs)>sqr(cs-1)) and (health(a1,cs)<=sqr(cs-1)*2) then textbackground(3);
+                if (health(a1,cs)<=sqr(cs-1)) then textbackground(4);
+                if lose(a1,cs)=false then
+                        for i:=1 to health(a1,cs) do
                                 write('  ');
                         textbackground(bg);
         end
         else
-                if lose(a,cs)=false then
+                if lose(a1,cs)=false then
                 begin
                         textbackground(txt);
-                        for i:=1 to health(a,cs) do
+                        for i:=1 to health(a1,cs) do
                                 write('  ');
                         textbackground(bg);
                 end;
-        for i:=1 to sqr(cs+1)-health(a,cs) do
+        for i:=1 to sqr(cs+1)-health(a1,cs) do
             write('  ');
-        if lose(a,cs)=false then
+        if lose(a1,cs)=false then
            if gfx<>1 then write('|') else write(chr(186))
            else if gfx<>1 then write('  |') else write('  ',chr(186));
-        gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) ,6);
-        writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
+        gotoxy(1,7);
         for i:=1 to sqr(cs+1)-1 do
             if gfx<>1 then write('__') else write(chr(205),chr(205));
         if gfx<>1 then write('_/') else write(chr(205),chr(205),chr(188));
-        writeln;
-     end {renders health bar when not using NF}
+     end; {renders health bar when not using NF}
+end;
+procedure hp2(a1:mang);
+begin
+     gotoxy(sqr(cs+1)*2+s-(4*(sqr(cs+1)+1))+3,5);
+     if gfx<>1 then write(':') else write(chr(201));
+     for i:=1 to sqr(cs+1) do
+         if gfx<>1 then write('--') else write(chr(205),chr(205));
+     gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,6);
+     if lose(d,cs)=false then
+        if gfx<>1 then write('|') else write(chr(186))
+     else if gfx<>1 then write('|  ') else write(chr(186),'  ');
+     for i:=1 to sqr(cs+1)-health(a1,cs) do
+         write('  ');
+     if color<>-1 then
+     begin
+          if (health(a1,cs)>sqr(cs-1)*2) and (health(a1,cs)<=sqr(cs-1)*4) then textbackground(2);
+          if (health(a1,cs)>sqr(cs-1)) and (health(a1,cs)<=sqr(cs-1)*2) then textbackground(3);
+          if (health(a1,cs)<=sqr(cs-1)) then textbackground(4);
+          if lose(d,cs)=false then
+          for i:=1 to health(a1,cs) do
+              write('  ');
+          textbackground(bg);
+     end
+     else
+         if lose(a1,cs)=false then
+         begin
+              textbackground(txt);
+              for i:=1 to health(a1,cs) do
+                  write('  ');
+              textbackground(bg);
+         end;
+     gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,7);
+     if gfx<>1 then write(' \_') else write(chr(200),chr(205),chr(205));
+     for i:=1 to sqr(cs+1)-1 do
+         if gfx<>1 then write('__') else write(chr(205),chr(205));
+end;
+procedure printf;{prints a board and health bar in singleplayer mode}
+var i,j,k,k1:byte;
+begin
+     k1:=0;
+     hp1(a);
+     if ((nofail<>1) and (s<80) and (cs<4)) or ((nofail<>1) and (s>=80)) then
+     begin
+           gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)) ,6);
+           write(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));
+     end
      else
      begin
           gotoxy(s-lnth(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1)),5);
@@ -585,11 +780,6 @@ begin
      end; {prints score to the screen}
      if (nofail=1) or ((s<80) and (cs>3)) then nofail1:=1 else nofail1:=-1;
      gotoxy((s-6*(cs+1)) div 2,7-nofail1);
-     if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs do
-         if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
-     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
-     {prints the top of the board}
      if cs>=4 then k1:=k1+3;
      if nofail=1 then k1:=k1+3;
      if spunout=1 then k1:=k1+3;
@@ -636,150 +826,7 @@ begin
           end;
           if flashlight=1 then write('FL');
      end; {prints mods that the player is using}
-     writeln;
-     for i:=0 to cs do
-     begin
-          gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+1);
-          if gfx<>1 then write('|') else write(chr(179));
-          for j:=0 to cs do
-          begin
-                   if (a[i,j]<>0) and (flashlight<>1) then
-                   {print numbers when flashlight mod is disabled and the number inside is not 0}
-                   begin
-                        if color<>-1 then
-                        begin
-                                textbackground(round(log2(a[i,j])));
-                                if (round(log2(a[i,j]))=txt) or (round(log2(a[i,j]))-8=txt) or (round(log2(a[i,j]))+8=txt)
-                                then textbackground(round(log2(a[i,j]))-1);
-                        end;{generate colors when color is enabled}
-                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                        if (a[i,j]>16) and (hidden=1) then {prints numbers when hidden mod is enabled}
-                        begin
-                                textbackground(bg);
-                                write('  ','?','  ');
-                        end;
-                        if a[i,j]<10 then
-                           write('  ',a[i,j],'  ');
-                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                           write('  ',a[i,j],' ');
-                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                           write(' ',a[i,j],' ');
-                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                           write(' ',a[i,j]);
-                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                           write(a[i,j]);
-                        textbackground(bg);
-                        if gfx<>1 then write('|') else write(chr(179));
-                   end;
-                   if (a[i,j]=0) and (flashlight<>1) then
-                   {print numbers when flashlight mod is disabled and the number inside is 0}
-                          if gfx<>1 then write('     |')
-                   else write('     ',chr(179));
-                   if (flashlight=1) and (efl=1) then
-                   begin{print numbers when flashlight mod and enhanced mode are enabled}
-                        if (x-1<=i) and (i<=x+1) and (y-1<=j) and (j<=y+1) then
-                        begin
-                                if a[i,j]=0 then
-                                        if gfx<>1 then write('     |')  else write('     ',chr(179))
-                                else
-                                begin
-                                        if color<>-1 then
-                                        begin
-                                                textbackground(round(log2(a[i,j])));
-                                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                                or (round(log2(a[i,j]))=txt)
-                                                then textbackground(round(log2(a[i,j])-1));
-                                        end;{generate colors when color is enabled}
-                                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                                        if (a[i,j]>16) and (hidden=1) then{print numbers when hidden mod is enabled}
-                                        begin
-                                                textbackground(bg);
-                                                write('  ','?','  ');
-                                        end;
-                                        if a[i,j]<10 then
-                                                write('  ',a[i,j],'  ');
-                                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                                                write('  ',a[i,j],' ');
-                                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                                                write(' ',a[i,j],' ');
-                                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                                                write(' ',a[i,j]);
-                                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                                                write(a[i,j]);
-                                        textbackground(bg);
-                                        if gfx<>1 then write('|') else write(chr(179));
-                                end;{prints numbers in the visible area}
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end;   {hides numbers not in the visible area}
-                    end;
-                    if (flashlight=1) and (efl=-1) then
-                    begin {print numbers when flashlight mod is enabled and enhanced mode is disabled}
-                        if ((health(a,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a,cs)<=2) and (i>=2) and (j<=cs-2)) then
-                        begin
-                             if a[i,j]=0 then
-                             if gfx<>1 then write('     |') else write('     ',chr(179));
-                             if a[i,j]<>0 then
-                             begin
-                                  if color<>-1 then
-                                  begin
-                                        textbackground(round(log2(a[i,j])));
-                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                        or (round(log2(a[i,j]))=txt)
-                                        then textbackground(round(log2(a[i,j])-1));
-                                  end;{generate colors when color is enabled}
-                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                                  if (a[i,j]>16) and (hidden=1) then
-                                  begin
-                                        textbackground(bg);
-                                        write('  ','?','  ');
-                                  end;{print numbers when hidden is enabled}
-                                  if a[i,j]<10 then
-                                     write('  ',a[i,j],'  ');
-                                  if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                                     write('  ',a[i,j],' ');
-                                  if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                                     write(' ',a[i,j],' ');
-                                  if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                                     write(' ',a[i,j]);
-                                  if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                                     write(a[i,j]);
-                                  textbackground(bg);
-                                  if gfx<>1 then write('|') else write(chr(179));
-                             end; {prints numbers in the visible area}
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end; {hides numbers not in the visible area}
-                    end;
-                    textbackground(bg);
-          end;
-          writeln;
-          gotoxy((s-6*(cs+1)) div 2,7-nofail1+i*2+2);
-          if i<cs then
-          begin
-               if gfx<>1 then write('|') else write(chr(195));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
-          end
-          else
-          begin
-               if gfx<>1 then write('|') else write(chr(192));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
-          end;
-     end;
+     board(a,(s-6*(cs+1)) div 2,7-nofail1+1);
      writeln('Moves:',count);{prints borders between lines}
 end;
 procedure printfmulti; {prints health bar and board in multiplayer mode}
@@ -789,361 +836,16 @@ begin
      if ((nofail<>1) and (s<120) and (cs<4)) or ((nofail<>1) and (s>=120)) then
      begin
         healthbar:=1;
-        for i:=1 to sqr(cs+1) do
-            if gfx<>1 then write('--') else write(chr(205),chr(205));
-        if gfx<>1 then write(':') else write(chr(187));
-        gotoxy(sqr(cs+1)*2+s-(4*(sqr(cs+1)+1))+3,5);
-        if gfx<>1 then write(':') else write(chr(201));
-        for i:=1 to sqr(cs+1) do
-            if gfx<>1 then write('--') else write(chr(205),chr(205));
-        writeln;
-        if color<>-1 then
-        begin
-                if (health(a,cs)>sqr(cs-1)*2) and (health(a,cs)<=sqr(cs-1)*4) then textbackground(2);
-                if (health(a,cs)>sqr(cs-1)) and (health(a,cs)<=sqr(cs-1)*2) then textbackground(3);
-                if (health(a,cs)<=sqr(cs-1)) then textbackground(4);
-                if lose(a,cs)=false then
-                        for i:=1 to health(a,cs) do
-                                write('  ');
-                        textbackground(bg);
-        end
-        else
-                if lose(a,cs)=false then
-                begin
-                        textbackground(txt);
-                        for i:=1 to health(a,cs) do
-                                write('  ');
-                        textbackground(bg);
-                end;
-        for i:=1 to sqr(cs+1)-health(a,cs) do
-            write('  ');
-        if lose(a,cs)=false then
-           if gfx<>1 then write('|') else write(chr(186))
-           else if gfx<>1 then write('  |') else write('  ',chr(186));
-        gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,6);
-        if lose(d,cs)=false then
-           if gfx<>1 then write('|') else write(chr(186))
-           else if gfx<>1 then write('|  ') else write(chr(186),'  ');
-        for i:=1 to sqr(cs+1)-health(d,cs) do
-            write('  ');
-        if color<>-1 then
-        begin
-                if (health(d,cs)>sqr(cs-1)*2) and (health(d,cs)<=sqr(cs-1)*4) then textbackground(2);
-                if (health(d,cs)>sqr(cs-1)) and (health(d,cs)<=sqr(cs-1)*2) then textbackground(3);
-                if (health(d,cs)<=sqr(cs-1)) then textbackground(4);
-                if lose(d,cs)=false then
-                        for i:=1 to health(d,cs) do
-                                write('  ');
-                        textbackground(bg);
-        end
-        else
-                if lose(d,cs)=false then
-                begin
-                        textbackground(txt);
-                        for i:=1 to health(d,cs) do
-                                write('  ');
-                        textbackground(bg);
-                end;
-        writeln;
-        {writeln(point(a,cs,hidden,hardrock,spunout,nofail,flashlight,diff1));}
-        for i:=1 to sqr(cs+1)-1 do
-            if gfx<>1 then write('__') else write(chr(205),chr(205));
-        if gfx<>1 then write('_/') else write(chr(205),chr(205),chr(188));
-        gotoxy(sqr(cs+1)*2+s-((sqr(cs+1)+1)*4)+3,7);
-        if gfx<>1 then write(' \_') else write(chr(200),chr(205),chr(205));
-        for i:=1 to sqr(cs+1)-1 do
-            if gfx<>1 then write('__') else write(chr(205),chr(205));
-        writeln;
+        if ((count=0) and (count1=0)) or (ch=left) or (ch=right) or (ch=up) or (ch=down) or (ch=re) then
+        hp1(a);
+        if ((count=0) and (count1=0)) or (ch=left1) or (ch=right1) or (ch=up1) or (ch=down1) or (ch=re1) then
+        hp2(d);
      end;
-     gotoxy((s-12*(cs+1)) div 3,5+healthbar*3);
-     if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs do
-         if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
-     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
-     gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+6*(cs+1)+(s-12*(cs+1)) div 3+1,5+healthbar*3);
-     if gfx<>1 then write('|') else write(chr(218));
-     for k:=1 to cs do
-         if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(194));
-     if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(191));
-     for i:=0 to cs do
-     begin
-          gotoxy((s-12*(cs+1)) div 3,6+i*2+healthbar*3);
-          if gfx<>1 then write('|') else write(chr(179));
-          for j:=0 to cs do
-          begin
-                   if (a[i,j]<>0) and (flashlight<>1) then
-                   begin
-                        if color<>-1 then
-                        begin
-                                textbackground(round(log2(a[i,j])));
-                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                or (round(log2(a[i,j]))=txt)
-                                then textbackground(round(log2(a[i,j])-1));
-                        end;
-                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                        if (a[i,j]>16) and (hidden=1) then
-                        begin
-                                textbackground(bg);
-                                write('  ','?','  ');
-                        end;
-                        if a[i,j]<10 then
-                           write('  ',a[i,j],'  ');
-                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                           write('  ',a[i,j],' ');
-                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                           write(' ',a[i,j],' ');
-                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                           write(' ',a[i,j]);
-                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                           write(a[i,j]);
-                        textbackground(bg);
-                        if gfx<>1 then write('|') else write(chr(179));
-                   end;
-                   if (a[i,j]=0) and (flashlight<>1) then
-                   if gfx<>1 then write('     |')
-                   else write('     ',chr(179));
-                    if (flashlight=1) and (efl=1) then
-                    begin
-                        if (x-1<=i) and (i<=x+1) and (y-1<=j) and (j<=y+1) then
-                        begin
-                                if a[i,j]=0 then
-                                        if gfx<>1 then write('     |')  else write('     ',chr(179))
-                                else
-                                begin
-                                        if color<>-1 then
-                                        begin
-                                                textbackground(round(log2(a[i,j])));
-                                                if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                                or (round(log2(a[i,j]))=txt)
-                                                then textbackground(round(log2(a[i,j])-1));
-                                        end;
-                                        if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                                        if (a[i,j]>16) and (hidden=1) then
-                                        begin
-                                                textbackground(bg);
-                                                write('  ','?','  ');
-                                        end;
-                                        if a[i,j]<10 then
-                                                write('  ',a[i,j],'  ');
-                                        if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                                                write('  ',a[i,j],' ');
-                                        if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                                                write(' ',a[i,j],' ');
-                                        if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                                                write(' ',a[i,j]);
-                                        if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                                                write(a[i,j]);
-                                        textbackground(bg);
-                                        if gfx<>1 then write('|') else write(chr(179));
-                                end;
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end;
-                   end;
-                    if (flashlight=1) and (efl=-1) then
-                    begin
-                        if ((health(a,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(a,cs)<=2) and (i>=2) and (j<=cs-2)) then
-                        begin
-                             if a[i,j]=0 then
-                             if gfx<>1 then write('     |') else write('     ',chr(179));
-                             if a[i,j]<>0 then
-                             begin
-                                  if color<>-1 then
-                                  begin
-                                        textbackground(round(log2(a[i,j])));
-                                        if (round(log2(a[i,j]))+8=txt) or (round(log2(a[i,j]))-8=txt)
-                                        or (round(log2(a[i,j]))=txt)
-                                        then textbackground(round(log2(a[i,j])-1));
-                                  end;
-                                  if (a[i,j]=16) and (hidden=1) then write('  ',a[i,j],' ');
-                                  if (a[i,j]>16) and (hidden=1) then
-                                  begin
-                                        textbackground(bg);
-                                        write('  ','?','  ');
-                                  end;
-                                  if a[i,j]<10 then
-                                     write('  ',a[i,j],'  ');
-                                  if (a[i,j]>9) and (a[i,j]<100) and (hidden=-1) then
-                                     write('  ',a[i,j],' ');
-                                  if (a[i,j]>99) and (a[i,j]<1000) and (hidden=-1) then
-                                     write(' ',a[i,j],' ');
-                                  if (a[i,j]>999) and (a[i,j]<10000) and (hidden=-1) then
-                                     write(' ',a[i,j]);
-                                  if (a[i,j]>9999) and (a[i,j]<100000) and (hidden=-1) then
-                                     write(a[i,j]);
-                                  textbackground(bg);
-                                  if gfx<>1 then write('|') else write(chr(179));
-                             end;
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end;
-                    end;
-                    textbackground(bg);
-          end;
-          gotoxy((s-12*(cs+1)) div 3+6*(cs+1)+(s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1,6+i*2+healthbar*3);
-          if gfx<>1 then write('|') else write(chr(179));
-          for j:=0 to cs do
-          begin
-                   if (d[i,j]<>0) and (flashlight<>1) then
-                   begin
-                        if color<>-1 then
-                        begin
-                                textbackground(round(log2(d[i,j])));
-                                if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
-                                or (round(log2(d[i,j]))=txt)
-                                then textbackground(round(log2(d[i,j])-1));
-                        end;
-                        if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
-                        if (d[i,j]>16) and (hidden=1) then
-                        begin
-                                textbackground(bg);
-                                write('  ','?','  ');
-                        end;
-                        if d[i,j]<10 then
-                           write('  ',d[i,j],'  ');
-                        if (d[i,j]>9) and (d[i,j]<100) and (hidden=-1) then
-                           write('  ',d[i,j],' ');
-                        if (d[i,j]>99) and (d[i,j]<1000) and (hidden=-1) then
-                           write(' ',d[i,j],' ');
-                        if (d[i,j]>999) and (d[i,j]<10000) and (hidden=-1) then
-                           write(' ',d[i,j]);
-                        if (d[i,j]>9999) and (d[i,j]<100000) and (hidden=-1) then
-                           write(d[i,j]);
-                        textbackground(bg);
-                        if gfx<>1 then write('|') else write(chr(179));
-                   end;
-                   if (d[i,j]=0) and (flashlight<>1) then
-                   if gfx<>1 then write('     |') else write('     ',chr(179));
-                    if (flashlight=1) and (efl=1) then
-                    begin
-                        if (x1-1<=i) and (i<=x1+1) and (y1-1<=j) and (j<=y1+1) then
-                        begin
-                                if d[i,j]=0 then
-                                        if gfx<>1 then write('     |') else write('     ',chr(179))
-                                else
-                                begin
-                                        if color<>-1 then
-                                        begin
-                                                textbackground(round(log2(d[i,j])));
-                                                if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
-                                                or (round(log2(d[i,j]))=txt)
-                                                then textbackground(round(log2(d[i,j])-1));
-                                        end;
-                                        if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
-                                        if (d[i,j]>16) and (hidden=1) then
-                                        begin
-                                                textbackground(bg);
-                                                write('  ','?','  ');
-                                        end;
-                                        if d[i,j]<10 then
-                                                write('  ',d[i,j],'  ');
-                                        if (d[i,j]>9) and (d[i,j]<100) and (hidden=-1) then
-                                                write('  ',d[i,j],' ');
-                                        if (d[i,j]>99) and (d[i,j]<1000) and (hidden=-1) then
-                                                write(' ',d[i,j],' ');
-                                        if (d[i,j]>999) and (d[i,j]<10000) and (hidden=-1) then
-                                                write(' ',d[i,j]);
-                                        if (d[i,j]>9999) and (d[i,j]<100000) and (hidden=-1) then
-                                                write(d[i,j]);
-                                        textbackground(bg);
-                                        if gfx<>1 then write('|') else write(chr(179));
-                                end;
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end;
-                   end;
-                    if (flashlight=1) and (efl=-1) then
-                    begin
-                        if ((health(d,cs)>2) and (i>=1) and (j<=cs-1)) or ((health(d,cs)<=2) and (i>=2) and (j<=cs-2)) then
-                        begin
-                             if d[i,j]=0 then
-                             if gfx<>1 then write('     |') else write('     ',chr(179));
-                             if d[i,j]<>0 then
-                             begin
-                                  if color<>-1 then
-                                  begin
-                                        textbackground(round(log2(d[i,j])));
-                                        if (round(log2(d[i,j]))+8=txt) or (round(log2(d[i,j]))-8=txt)
-                                        or (round(log2(d[i,j]))=txt)
-                                        then textbackground(round(log2(d[i,j])-1));
-                                  end;
-                                  if (d[i,j]=16) and (hidden=1) then write('  ',d[i,j],' ');
-                                  if (d[i,j]>16) and (hidden=1) then
-                                  begin
-                                        textbackground(bg);
-                                        write('  ','?','  ');
-                                  end;
-                                  if d[i,j]<10 then
-                                     write('  ',d[i,j],'  ');
-                                  if (d[i,j]>9) and (d[i,j]<100) and (hidden=-1) then
-                                     write('  ',d[i,j],' ');
-                                  if (d[i,j]>99) and (d[i,j]<1000) and (hidden=-1) then
-                                     write(' ',d[i,j],' ');
-                                  if (d[i,j]>999) and (d[i,j]<10000) and (hidden=-1) then
-                                     write(' ',d[i,j]);
-                                  if (d[i,j]>9999) and (d[i,j]<100000) and (hidden=-1) then
-                                     write(d[i,j]);
-                                  textbackground(bg);
-                                  if gfx<>1 then write('|') else write(chr(179));
-                             end;
-                        end
-                        else
-                        begin
-                                textbackground(txt);
-                                write('     ');
-                                textbackground(bg);
-                                if gfx<>1 then write('|') else write(chr(179));
-                        end;
-                    end;
-                    textbackground(bg);
-          end;
-          writeln;
-          gotoxy((s-12*(cs+1)) div 3,7+healthbar*3+2*i);
-          if i<cs then
-          begin
-               if gfx<>1 then write('|') else write(chr(195));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
-          end
-          else
-          begin
-               if gfx<>1 then write('|') else write(chr(192));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
-          end;
-          gotoxy((s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1+6*(cs+1)+(s-12*(cs+1)) div 3,7+healthbar*3+2*i);
-          if i<cs then
-          begin
-               if gfx<>1 then write('|') else write(chr(195));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(197));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(180));
-          end
-          else
-          begin
-               if gfx<>1 then write('|') else write(chr(192));
-               for k:=1 to cs do
-                   if gfx<>1 then write('-----|') else write(chr(196),chr(196),chr(196),chr(196),chr(196),chr(193));
-               if gfx<>1 then writeln('-----|') else writeln(chr(196),chr(196),chr(196),chr(196),chr(196),chr(217));
-          end;
-     end;
+     if ((count=0) and (count1=0)) or (ch=left) or (ch=right) or (ch=up) or (ch=down) or (ch=re) then
+     board(a,(s-12*(cs+1)) div 3,6+healthbar*3);
+     if ((count=0) and (count1=0)) or (ch=left1) or (ch=right1) or (ch=up1) or (ch=down1) or (ch=re1) then
+     board(d,(s-12*(cs+1)) div 3+6*(cs+1)+(s-12*(cs+1)-((s-12*(cs+1)) div 3)) div 2+1,6+healthbar*3);
+     gotoxy(1,6+healthbar*3+(cs+1)*2);
      writeln('Moves P1:',count);
      writeln('Moves P2:',count1);
 end;
@@ -1547,7 +1249,7 @@ begin
      else
          writeln;
      calibrate('Hit esc to Exit',s-16);
-     calibrate('Update 5.4',s-22);
+     calibrate('Update 5.4.1',s-20);
      writeln;
      for i:=1 to (s-32) div 2 do
         write(' ');
